@@ -1,0 +1,27 @@
+A quick description of the template feature class.
+All feature classes must be in WGS84. If made in other coordinate systems, it will eventually be converted.
+First 3 records are there as examples.
+
+* <- mandatory fields.
+
+
+*Project ID: MANDATORY FIELD! A unique id of the project or the block. Every record's Project ID must be unique.
+*Number of Clusters: MANDATORY FIELD! Number of cluster points in this project/block.
+Area_ha: Area in hectare.
+MNRF_AssessmentMethod: Assessment done via Aerial or Ground
+MNRF Assessment Year: Year assessed by the MNRF
+*PlotSize_m2: for all boreal forests in 2020, the value of this field should be 8.
+YRDEP: Year of last depletion.
+DepletionFU: Forest Unit before it was depleted
+TargetFU: intended future Forest Unit
+SILVSYS: Silvicultural Systems
+SGR: Silvicultural Ground Rule codes
+*FMU: Forest Management Unit
+*District: MNR District
+SFL_SPCOMP: Species composition assessment result by the SFL.
+SFL_SO: Site Occupancy result by the SFL. should range from 0 to 1. It's the ratio of occupied plot over all surveyed plots.
+SFL_FU: Forest Unit result by the SFL.
+SFL_EffDens: Effective density calculated by the SFL (if available). should range from 0 to 3000.
+SFL_AssessmentMethod: Assessment done via Aerial or Ground
+SFL_Name: Name of the SFL company that conducted the survey.
+SFL Assessment Year: Year assessed by the SFL.

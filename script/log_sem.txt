@@ -1,0 +1,1641 @@
+sdfasdf01/28/2021 11:44:11 AM ### ## #  Launching SEM program  # ## ###
+01/28/2021 11:44:11 AM Time: Jan 28, 2021. 11:44 AM
+01/28/2021 11:44:11 AM version 0.1
+01/28/2021 11:44:11 AM Stand-alone SEM.py run - TDT tool did not run!
+01/28/2021 11:44:11 AM Config file used: D:\ACTIVE\HomeOffice\RAP\script\SEM.cfg
+01/28/2021 11:44:11 AM Survey Data being used: D:\ACTIVE\HomeOffice\RAP_Outputs\raw_data\NER-RAP_28-Jan-21_10-48\data
+01/28/2021 11:44:11 AM All variables from the config file:
+{'CALC': {'default_plot_area': '8',
+          'max_height': '40',
+          'max_num_of_t_per_plot': '6',
+          'min_height': '0.5',
+          'num_of_plots': '8',
+          'num_of_trees_4_spcomp': '2'},
+ 'CSV': {'csvfolderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\raw_data\\NER-RAP_28-Jan-21_10-48\\data',
+         'dbfolderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\sqlite',
+         'output_csv_folderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\csv'},
+ 'LOG': {'debug': 'False'},
+ 'PDF': {'report_folder': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\pdf_to_post\\reports'},
+ 'SHP': {'area_ha_fieldname': 'Area_ha',
+         'dist_fieldname': 'District',
+         'fmu_fieldname': 'FMU',
+         'num_clus_fieldname': 'NumCluster',
+         'plot_size_fieldname': 'PlotSize_m',
+         'project_id_fieldname': 'ProjectID',
+         'project_shpfile': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\Proj_shp\\RAP_2020_Draft.shp',
+         'shp2sqlite_tablename': 'projects_shp'},
+ 'SPC': {'csv': 'SpeciesGroup.csv'},
+ 'SQLITE': {'clus_summary_tblname': 'Cluster_Summary',
+            'fin_proj_id': 'fin_proj_id',
+            'geo_check_fieldname': 'geo_proj_id',
+            'plot_summary_tblname': 'Plot_Summary',
+            'proj_id_override': 'ProjIDManualOverride',
+            'proj_summary_tblname': 'Project_Summary',
+            'unique_id_fieldname': 'unique_id'},
+ 'html': {'output_folder': 'D:\\ACTIVE\\HomeOffice\\RAP_outputs\\browser'}}
+01/28/2021 11:44:11 AM spc_to_check = ['AB', 'AW', 'BD', 'BE', 'BF', 'BN', 'BW', 'BY', 'CB', 'CE', 'CW', 'EW', 'EX', 'HE', 'HI', 'IW', 'LA', 'MH', 'MR', 'MS', 'OB', 'OR', 'OW', 'OX', 'PB', 'PJ', 'PL', 'PO', 'PR', 'PS', 'PT', 'PW', 'SB', 'SN', 'SR', 'SW', 'SX']
+01/28/2021 11:44:11 AM spc_group_dict = {'AX': ['AB', 'AW'], 'BD': ['BD'], 'BE': ['BE'], 'BF': ['BF'], 'BN': ['BN'], 'BW': ['BW'], 'BY': ['BY'], 'CB': ['CB'], 'CE': ['CE', 'CW'], 'EX': ['EW', 'EX'], 'HE': ['HE'], 'HI': ['HI'], 'IW': ['IW'], 'LA': ['LA'], 'MH': ['MH'], 'MR': ['MR'], 'MS': ['MS'], 'OX': ['OB', 'OR', 'OW', 'OX'], 'PO': ['PB', 'PL', 'PO', 'PT'], 'PJ': ['PJ'], 'PX': ['PR', 'PS'], 'PW': ['PW'], 'SX': ['SB', 'SN', 'SR', 'SW', 'SX']}
+01/28/2021 11:44:11 AM 
+
+01/28/2021 11:44:11 AM --> Running csv2sqlite module
+01/28/2021 11:44:11 AM working on 'Cluster_Survey'
+01/28/2021 11:44:11 AM * WARNING: Cluster_Survey does not have latitude or longitude field.
+01/28/2021 11:44:11 AM In the table, Cluster_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 11:44:11 AM In the table, Cluster_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 11:44:11 AM Number of deleted records (test data): 34
+01/28/2021 11:44:11 AM 415 rows have been added to 'Cluster_Survey' table in the sqlite database.
+01/28/2021 11:44:11 AM working on 'Project_Survey'
+01/28/2021 11:44:11 AM * WARNING: Project_Survey does not have latitude or longitude field.
+01/28/2021 11:44:11 AM In the table, Project_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 11:44:11 AM In the table, Project_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 11:44:11 AM Number of deleted records (test data): 8
+01/28/2021 11:44:11 AM 13 rows have been added to 'Project_Survey' table in the sqlite database.
+01/28/2021 11:44:11 AM 
+
+01/28/2021 11:44:11 AM --> Running shp2sqlite module
+01/28/2021 11:44:11 AM Running dict_lst_to_sqlite() to create a new table called projects_shp
+01/28/2021 11:44:11 AM 28 rows have been successfully transferred to projects_shp.
+01/28/2021 11:44:12 AM 
+
+01/28/2021 11:44:12 AM --> Running determine_project_id module
+01/28/2021 11:44:12 AM Opened D:\ACTIVE\HomeOffice\RAP\script\Proj_shp\RAP_2020_Draft.shp
+01/28/2021 11:44:12 AM Adding geo check field
+01/28/2021 11:44:12 AM !!!! The following cluster surveys are not located within any project boundaries !!!!
+01/28/2021 11:44:13 AM !!!! Unique_id: 20, Cluster Num: 101, Lat Lon: 48.4970497340279, -81.3450264930725 !!!!
+01/28/2021 11:44:13 AM Populating (Updating) SQLite geo_check field with ProjectIDs
+01/28/2021 11:44:13 AM 
+
+01/28/2021 11:44:13 AM --> Running analysis module
+01/28/2021 11:44:13 AM Running Summarize_clusters method
+01/28/2021 11:44:13 AM Running dict_lst_to_sqlite() to create a new table called Cluster_Summary
+01/28/2021 11:44:13 AM 415 rows have been successfully transferred to Cluster_Summary.
+01/28/2021 11:44:13 AM Running summarize_projects method
+01/28/2021 11:44:13 AM !!!! multiple matching project survey records for ProjectID = b3 !!!!
+01/28/2021 11:44:13 AM !!!! multiple matching project survey records for ProjectID = Michaud132 !!!!
+01/28/2021 11:44:13 AM Running dict_lst_to_sqlite() to create a new table called Project_Summary
+01/28/2021 11:44:14 AM 28 rows have been successfully transferred to Project_Summary.
+01/28/2021 11:44:14 AM Running dict_lst_to_sqlite() to create a new table called Plot_Summary
+01/28/2021 11:44:16 AM 3320 rows have been successfully transferred to Plot_Summary.
+01/28/2021 11:44:17 AM Running dict_lst_to_sqlite() to create a new table called z_PBLK01
+01/28/2021 11:44:17 AM 47 rows have been successfully transferred to z_PBLK01.
+01/28/2021 11:44:17 AM Running dict_lst_to_sqlite() to create a new table called z_b3
+01/28/2021 11:44:17 AM 28 rows have been successfully transferred to z_b3.
+01/28/2021 11:44:17 AM Running dict_lst_to_sqlite() to create a new table called z_b6
+01/28/2021 11:44:17 AM 30 rows have been successfully transferred to z_b6.
+01/28/2021 11:44:17 AM Running dict_lst_to_sqlite() to create a new table called z_b4
+01/28/2021 11:44:18 AM 30 rows have been successfully transferred to z_b4.
+01/28/2021 11:44:18 AM Running dict_lst_to_sqlite() to create a new table called z_c3
+01/28/2021 11:44:18 AM 30 rows have been successfully transferred to z_c3.
+01/28/2021 11:44:18 AM Running dict_lst_to_sqlite() to create a new table called z_Michaud132
+01/28/2021 11:44:18 AM 125 rows have been successfully transferred to z_Michaud132.
+01/28/2021 11:44:18 AM Running dict_lst_to_sqlite() to create a new table called z_Michaud131
+01/28/2021 11:44:18 AM 29 rows have been successfully transferred to z_Michaud131.
+01/28/2021 11:44:19 AM Running dict_lst_to_sqlite() to create a new table called z_Michaud130
+01/28/2021 11:44:19 AM 95 rows have been successfully transferred to z_Michaud130.
+01/28/2021 11:44:19 AM 
+
+01/28/2021 11:44:19 AM --> Running To_csv module
+01/28/2021 11:44:19 AM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 11:44:19 AM Running plot_to_csv method
+01/28/2021 11:44:19 AM Running clus_to_csv
+01/28/2021 11:44:19 AM 
+
+01/28/2021 11:44:19 AM --> Running to_browsers module
+01/28/2021 11:44:19 AM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 11:44:20 AM SEM program completed
+
+
+
+01/28/2021 11:55:30 AM ### ## #  Launching SEM program  # ## ###
+01/28/2021 11:55:30 AM Time: Jan 28, 2021. 11:55 AM
+01/28/2021 11:55:30 AM version 0.1
+01/28/2021 11:55:30 AM Stand-alone SEM.py run - TDT tool did not run!
+01/28/2021 11:55:30 AM Config file used: D:\ACTIVE\HomeOffice\RAP\script\SEM.cfg
+01/28/2021 11:55:30 AM Survey Data being used: D:\ACTIVE\HomeOffice\RAP_Outputs\raw_data\NER-RAP_28-Jan-21_10-48\data
+01/28/2021 11:55:30 AM All variables from the config file:
+{'CALC': {'default_plot_area': '8',
+          'max_height': '40',
+          'max_num_of_t_per_plot': '6',
+          'min_height': '0.5',
+          'num_of_plots': '8',
+          'num_of_trees_4_spcomp': '2'},
+ 'CSV': {'csvfolderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\raw_data\\NER-RAP_28-Jan-21_10-48\\data',
+         'dbfolderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\sqlite',
+         'output_csv_folderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\csv'},
+ 'LOG': {'debug': 'False'},
+ 'PDF': {'ref_folder': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\pdf_to_post\\ref',
+         'report_folder': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\pdf_to_post\\reports'},
+ 'SHP': {'area_ha_fieldname': 'Area_ha',
+         'dist_fieldname': 'District',
+         'fmu_fieldname': 'FMU',
+         'num_clus_fieldname': 'NumCluster',
+         'plot_size_fieldname': 'PlotSize_m',
+         'project_id_fieldname': 'ProjectID',
+         'project_shpfile': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\Proj_shp\\RAP_2020_Draft.shp',
+         'shp2sqlite_tablename': 'projects_shp'},
+ 'SPC': {'csv': 'SpeciesGroup.csv'},
+ 'SQLITE': {'clus_summary_tblname': 'Cluster_Summary',
+            'fin_proj_id': 'fin_proj_id',
+            'geo_check_fieldname': 'geo_proj_id',
+            'plot_summary_tblname': 'Plot_Summary',
+            'proj_id_override': 'ProjIDManualOverride',
+            'proj_summary_tblname': 'Project_Summary',
+            'unique_id_fieldname': 'unique_id'},
+ 'html': {'output_folder': 'D:\\ACTIVE\\HomeOffice\\RAP_outputs\\browser'}}
+01/28/2021 11:55:30 AM spc_to_check = ['AB', 'AW', 'BD', 'BE', 'BF', 'BN', 'BW', 'BY', 'CB', 'CE', 'CW', 'EW', 'EX', 'HE', 'HI', 'IW', 'LA', 'MH', 'MR', 'MS', 'OB', 'OR', 'OW', 'OX', 'PB', 'PJ', 'PL', 'PO', 'PR', 'PS', 'PT', 'PW', 'SB', 'SN', 'SR', 'SW', 'SX']
+01/28/2021 11:55:30 AM spc_group_dict = {'AX': ['AB', 'AW'], 'BD': ['BD'], 'BE': ['BE'], 'BF': ['BF'], 'BN': ['BN'], 'BW': ['BW'], 'BY': ['BY'], 'CB': ['CB'], 'CE': ['CE', 'CW'], 'EX': ['EW', 'EX'], 'HE': ['HE'], 'HI': ['HI'], 'IW': ['IW'], 'LA': ['LA'], 'MH': ['MH'], 'MR': ['MR'], 'MS': ['MS'], 'OX': ['OB', 'OR', 'OW', 'OX'], 'PO': ['PB', 'PL', 'PO', 'PT'], 'PJ': ['PJ'], 'PX': ['PR', 'PS'], 'PW': ['PW'], 'SX': ['SB', 'SN', 'SR', 'SW', 'SX']}
+01/28/2021 11:55:30 AM 
+
+01/28/2021 11:55:30 AM --> Running csv2sqlite module
+01/28/2021 11:55:30 AM working on 'Cluster_Survey'
+01/28/2021 11:55:30 AM * WARNING: Cluster_Survey does not have latitude or longitude field.
+01/28/2021 11:55:30 AM In the table, Cluster_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 11:55:30 AM In the table, Cluster_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 11:55:30 AM Number of deleted records (test data): 34
+01/28/2021 11:55:30 AM 415 rows have been added to 'Cluster_Survey' table in the sqlite database.
+01/28/2021 11:55:30 AM working on 'Project_Survey'
+01/28/2021 11:55:30 AM * WARNING: Project_Survey does not have latitude or longitude field.
+01/28/2021 11:55:30 AM In the table, Project_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 11:55:30 AM In the table, Project_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 11:55:30 AM Number of deleted records (test data): 8
+01/28/2021 11:55:30 AM 13 rows have been added to 'Project_Survey' table in the sqlite database.
+01/28/2021 11:55:30 AM 
+
+01/28/2021 11:55:30 AM --> Running shp2sqlite module
+01/28/2021 11:55:30 AM Running dict_lst_to_sqlite() to create a new table called projects_shp
+01/28/2021 11:55:30 AM 28 rows have been successfully transferred to projects_shp.
+01/28/2021 11:55:30 AM 
+
+01/28/2021 11:55:30 AM --> Running determine_project_id module
+01/28/2021 11:55:30 AM Opened D:\ACTIVE\HomeOffice\RAP\script\Proj_shp\RAP_2020_Draft.shp
+01/28/2021 11:55:31 AM Adding geo check field
+01/28/2021 11:55:31 AM !!!! The following cluster surveys are not located within any project boundaries !!!!
+01/28/2021 11:55:31 AM !!!! Unique_id: 20, Cluster Num: 101, Lat Lon: 48.4970497340279, -81.3450264930725 !!!!
+01/28/2021 11:55:31 AM Populating (Updating) SQLite geo_check field with ProjectIDs
+01/28/2021 11:55:32 AM 
+
+01/28/2021 11:55:32 AM --> Running analysis module
+01/28/2021 11:55:32 AM Running Summarize_clusters method
+01/28/2021 11:55:32 AM Running dict_lst_to_sqlite() to create a new table called Cluster_Summary
+01/28/2021 11:55:32 AM 415 rows have been successfully transferred to Cluster_Summary.
+01/28/2021 11:55:32 AM Running summarize_projects method
+01/28/2021 11:55:32 AM !!!! multiple matching project survey records for ProjectID = b3 !!!!
+01/28/2021 11:55:32 AM !!!! multiple matching project survey records for ProjectID = Michaud132 !!!!
+01/28/2021 11:55:32 AM Running dict_lst_to_sqlite() to create a new table called Project_Summary
+01/28/2021 11:55:32 AM 28 rows have been successfully transferred to Project_Summary.
+01/28/2021 11:55:33 AM Running dict_lst_to_sqlite() to create a new table called Plot_Summary
+01/28/2021 11:55:35 AM 3320 rows have been successfully transferred to Plot_Summary.
+01/28/2021 11:55:35 AM Running dict_lst_to_sqlite() to create a new table called z_PBLK01
+01/28/2021 11:55:36 AM 47 rows have been successfully transferred to z_PBLK01.
+01/28/2021 11:55:36 AM Running dict_lst_to_sqlite() to create a new table called z_b3
+01/28/2021 11:55:36 AM 28 rows have been successfully transferred to z_b3.
+01/28/2021 11:55:36 AM Running dict_lst_to_sqlite() to create a new table called z_b6
+01/28/2021 11:55:36 AM 30 rows have been successfully transferred to z_b6.
+01/28/2021 11:55:36 AM Running dict_lst_to_sqlite() to create a new table called z_b4
+01/28/2021 11:55:37 AM 30 rows have been successfully transferred to z_b4.
+01/28/2021 11:55:37 AM Running dict_lst_to_sqlite() to create a new table called z_c3
+01/28/2021 11:55:37 AM 30 rows have been successfully transferred to z_c3.
+01/28/2021 11:55:37 AM Running dict_lst_to_sqlite() to create a new table called z_Michaud132
+01/28/2021 11:55:37 AM 125 rows have been successfully transferred to z_Michaud132.
+01/28/2021 11:55:37 AM Running dict_lst_to_sqlite() to create a new table called z_Michaud131
+01/28/2021 11:55:38 AM 29 rows have been successfully transferred to z_Michaud131.
+01/28/2021 11:55:38 AM Running dict_lst_to_sqlite() to create a new table called z_Michaud130
+01/28/2021 11:55:38 AM 95 rows have been successfully transferred to z_Michaud130.
+01/28/2021 11:55:38 AM 
+
+01/28/2021 11:55:38 AM --> Running To_csv module
+01/28/2021 11:55:38 AM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 11:55:38 AM Running plot_to_csv method
+01/28/2021 11:55:38 AM Running clus_to_csv
+01/28/2021 11:55:38 AM 
+
+01/28/2021 11:55:38 AM --> Running to_browsers module
+01/28/2021 11:55:38 AM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 11:55:39 AM SEM program completed
+
+
+
+01/28/2021 01:34:52 PM ### ## #  Launching SEM program  # ## ###
+01/28/2021 01:34:52 PM Time: Jan 28, 2021. 01:34 PM
+01/28/2021 01:34:52 PM version 0.1
+01/28/2021 01:34:52 PM Stand-alone SEM.py run - TDT tool did not run!
+01/28/2021 01:34:52 PM Config file used: D:\ACTIVE\HomeOffice\RAP\script\SEM.cfg
+01/28/2021 01:34:52 PM Survey Data being used: D:\ACTIVE\HomeOffice\RAP_Outputs\raw_data\NER-RAP_28-Jan-21_10-48\data
+01/28/2021 01:34:52 PM All variables from the config file:
+{'CALC': {'default_plot_area': '8',
+          'max_height': '40',
+          'max_num_of_t_per_plot': '6',
+          'min_height': '0.5',
+          'num_of_plots': '8',
+          'num_of_trees_4_spcomp': '2'},
+ 'CSV': {'csvfolderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\raw_data\\NER-RAP_28-Jan-21_10-48\\data',
+         'dbfolderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\sqlite',
+         'output_csv_folderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\csv'},
+ 'LOG': {'debug': 'False'},
+ 'PDF': {'ref_folder': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\pdf_to_post\\ref',
+         'report_folder': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\pdf_to_post\\reports'},
+ 'SHP': {'area_ha_fieldname': 'Area_ha',
+         'dist_fieldname': 'District',
+         'fmu_fieldname': 'FMU',
+         'num_clus_fieldname': 'NumCluster',
+         'plot_size_fieldname': 'PlotSize_m',
+         'project_id_fieldname': 'ProjectID',
+         'project_shpfile': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\Proj_shp\\RAP_2020_Draft.shp',
+         'shp2sqlite_tablename': 'projects_shp'},
+ 'SPC': {'csv': 'SpeciesGroup.csv'},
+ 'SQLITE': {'clus_summary_tblname': 'Cluster_Summary',
+            'fin_proj_id': 'fin_proj_id',
+            'geo_check_fieldname': 'geo_proj_id',
+            'plot_summary_tblname': 'Plot_Summary',
+            'proj_id_override': 'ProjIDManualOverride',
+            'proj_summary_tblname': 'Project_Summary',
+            'unique_id_fieldname': 'unique_id'},
+ 'html': {'output_folder': 'D:\\ACTIVE\\HomeOffice\\RAP_outputs\\browser'}}
+01/28/2021 01:34:52 PM spc_to_check = ['AB', 'AW', 'BD', 'BE', 'BF', 'BN', 'BW', 'BY', 'CB', 'CE', 'CW', 'EW', 'EX', 'HE', 'HI', 'IW', 'LA', 'MH', 'MR', 'MS', 'OB', 'OR', 'OW', 'OX', 'PB', 'PJ', 'PL', 'PO', 'PR', 'PS', 'PT', 'PW', 'SB', 'SN', 'SR', 'SW', 'SX']
+01/28/2021 01:34:52 PM spc_group_dict = {'AX': ['AB', 'AW'], 'BD': ['BD'], 'BE': ['BE'], 'BF': ['BF'], 'BN': ['BN'], 'BW': ['BW'], 'BY': ['BY'], 'CB': ['CB'], 'CE': ['CE', 'CW'], 'EX': ['EW', 'EX'], 'HE': ['HE'], 'HI': ['HI'], 'IW': ['IW'], 'LA': ['LA'], 'MH': ['MH'], 'MR': ['MR'], 'MS': ['MS'], 'OX': ['OB', 'OR', 'OW', 'OX'], 'PO': ['PB', 'PL', 'PO', 'PT'], 'PJ': ['PJ'], 'PX': ['PR', 'PS'], 'PW': ['PW'], 'SX': ['SB', 'SN', 'SR', 'SW', 'SX']}
+01/28/2021 01:34:52 PM 
+
+01/28/2021 01:34:52 PM --> Running csv2sqlite module
+01/28/2021 01:34:52 PM working on 'Cluster_Survey'
+01/28/2021 01:34:52 PM * WARNING: Cluster_Survey does not have latitude or longitude field.
+01/28/2021 01:34:52 PM In the table, Cluster_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 01:34:52 PM In the table, Cluster_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 01:34:52 PM Number of deleted records (test data): 34
+01/28/2021 01:34:52 PM 415 rows have been added to 'Cluster_Survey' table in the sqlite database.
+01/28/2021 01:34:52 PM working on 'Project_Survey'
+01/28/2021 01:34:52 PM * WARNING: Project_Survey does not have latitude or longitude field.
+01/28/2021 01:34:52 PM In the table, Project_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 01:34:52 PM In the table, Project_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 01:34:52 PM Number of deleted records (test data): 8
+01/28/2021 01:34:52 PM 13 rows have been added to 'Project_Survey' table in the sqlite database.
+01/28/2021 01:34:52 PM 
+
+01/28/2021 01:34:52 PM --> Running shp2sqlite module
+01/28/2021 01:34:52 PM Running dict_lst_to_sqlite() to create a new table called projects_shp
+01/28/2021 01:34:52 PM 28 rows have been successfully transferred to projects_shp.
+01/28/2021 01:34:52 PM 
+
+01/28/2021 01:34:52 PM --> Running determine_project_id module
+01/28/2021 01:34:52 PM Opened D:\ACTIVE\HomeOffice\RAP\script\Proj_shp\RAP_2020_Draft.shp
+01/28/2021 01:34:52 PM Adding geo check field
+01/28/2021 01:34:53 PM !!!! The following cluster surveys are not located within any project boundaries !!!!
+01/28/2021 01:34:53 PM !!!! Unique_id: 20, Cluster Num: 101, Lat Lon: 48.4970497340279, -81.3450264930725 !!!!
+01/28/2021 01:34:53 PM Populating (Updating) SQLite geo_check field with ProjectIDs
+01/28/2021 01:34:54 PM 
+
+01/28/2021 01:34:54 PM --> Running analysis module
+01/28/2021 01:34:54 PM Running Summarize_clusters method
+01/28/2021 01:34:54 PM Running dict_lst_to_sqlite() to create a new table called Cluster_Summary
+01/28/2021 01:34:54 PM 415 rows have been successfully transferred to Cluster_Summary.
+01/28/2021 01:34:54 PM Running summarize_projects method
+01/28/2021 01:34:54 PM !!!! multiple matching project survey records for ProjectID = b3 !!!!
+01/28/2021 01:34:54 PM !!!! multiple matching project survey records for ProjectID = Michaud132 !!!!
+01/28/2021 01:34:55 PM Running dict_lst_to_sqlite() to create a new table called Project_Summary
+01/28/2021 01:34:55 PM 28 rows have been successfully transferred to Project_Summary.
+01/28/2021 01:34:55 PM Running dict_lst_to_sqlite() to create a new table called Plot_Summary
+01/28/2021 01:34:57 PM 3320 rows have been successfully transferred to Plot_Summary.
+01/28/2021 01:34:58 PM Running dict_lst_to_sqlite() to create a new table called z_PBLK01
+01/28/2021 01:34:58 PM 47 rows have been successfully transferred to z_PBLK01.
+01/28/2021 01:34:58 PM Running dict_lst_to_sqlite() to create a new table called z_b3
+01/28/2021 01:34:58 PM 28 rows have been successfully transferred to z_b3.
+01/28/2021 01:34:58 PM Running dict_lst_to_sqlite() to create a new table called z_b6
+01/28/2021 01:34:58 PM 30 rows have been successfully transferred to z_b6.
+01/28/2021 01:34:58 PM Running dict_lst_to_sqlite() to create a new table called z_b4
+01/28/2021 01:34:59 PM 30 rows have been successfully transferred to z_b4.
+01/28/2021 01:34:59 PM Running dict_lst_to_sqlite() to create a new table called z_c3
+01/28/2021 01:34:59 PM 30 rows have been successfully transferred to z_c3.
+01/28/2021 01:34:59 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud132
+01/28/2021 01:34:59 PM 125 rows have been successfully transferred to z_Michaud132.
+01/28/2021 01:34:59 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud131
+01/28/2021 01:35:00 PM 29 rows have been successfully transferred to z_Michaud131.
+01/28/2021 01:35:00 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud130
+01/28/2021 01:35:00 PM 95 rows have been successfully transferred to z_Michaud130.
+01/28/2021 01:35:00 PM 
+
+01/28/2021 01:35:00 PM --> Running To_csv module
+01/28/2021 01:35:00 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 01:35:00 PM Running plot_to_csv method
+01/28/2021 01:35:00 PM Running clus_to_csv
+01/28/2021 01:35:00 PM 
+
+01/28/2021 01:35:00 PM --> Running to_browsers module
+01/28/2021 01:35:00 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 01:35:01 PM Traceback (most recent call last):
+  File "D:\ACTIVE\HomeOffice\RAP\script\SEM.py", line 105, in sem
+    to_b.run_all()
+  File "D:\ACTIVE\HomeOffice\RAP\script\modules\to_browsers.py", line 455, in run_all
+    self.add_supp_doc()
+  File "D:\ACTIVE\HomeOffice\RAP\script\modules\to_browsers.py", line 429, in add_supp_doc
+    shutil.copy(pdf_old_path, pdf_new_path)
+  File "C:\Python37\WPy64-3760\python-3.7.6.amd64\lib\shutil.py", line 248, in copy
+    copyfile(src, dst, follow_symlinks=follow_symlinks)
+  File "C:\Python37\WPy64-3760\python-3.7.6.amd64\lib\shutil.py", line 120, in copyfile
+    with open(src, 'rb') as fsrc:
+FileNotFoundError: [Errno 2] No such file or directory: 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\pdf_to_post\\reports\\HOWTOUSETERRAFLEXFORRAP2020_AUG07.PDF'
+
+01/28/2021 01:36:19 PM ### ## #  Launching SEM program  # ## ###
+01/28/2021 01:36:19 PM Time: Jan 28, 2021. 01:36 PM
+01/28/2021 01:36:19 PM version 0.1
+01/28/2021 01:36:19 PM Stand-alone SEM.py run - TDT tool did not run!
+01/28/2021 01:36:19 PM Config file used: D:\ACTIVE\HomeOffice\RAP\script\SEM.cfg
+01/28/2021 01:36:19 PM Survey Data being used: D:\ACTIVE\HomeOffice\RAP_Outputs\raw_data\NER-RAP_28-Jan-21_10-48\data
+01/28/2021 01:36:19 PM All variables from the config file:
+{'CALC': {'default_plot_area': '8',
+          'max_height': '40',
+          'max_num_of_t_per_plot': '6',
+          'min_height': '0.5',
+          'num_of_plots': '8',
+          'num_of_trees_4_spcomp': '2'},
+ 'CSV': {'csvfolderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\raw_data\\NER-RAP_28-Jan-21_10-48\\data',
+         'dbfolderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\sqlite',
+         'output_csv_folderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\csv'},
+ 'LOG': {'debug': 'False'},
+ 'PDF': {'ref_folder': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\pdf_to_post\\ref',
+         'report_folder': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\pdf_to_post\\reports'},
+ 'SHP': {'area_ha_fieldname': 'Area_ha',
+         'dist_fieldname': 'District',
+         'fmu_fieldname': 'FMU',
+         'num_clus_fieldname': 'NumCluster',
+         'plot_size_fieldname': 'PlotSize_m',
+         'project_id_fieldname': 'ProjectID',
+         'project_shpfile': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\Proj_shp\\RAP_2020_Draft.shp',
+         'shp2sqlite_tablename': 'projects_shp'},
+ 'SPC': {'csv': 'SpeciesGroup.csv'},
+ 'SQLITE': {'clus_summary_tblname': 'Cluster_Summary',
+            'fin_proj_id': 'fin_proj_id',
+            'geo_check_fieldname': 'geo_proj_id',
+            'plot_summary_tblname': 'Plot_Summary',
+            'proj_id_override': 'ProjIDManualOverride',
+            'proj_summary_tblname': 'Project_Summary',
+            'unique_id_fieldname': 'unique_id'},
+ 'html': {'output_folder': 'D:\\ACTIVE\\HomeOffice\\RAP_outputs\\browser'}}
+01/28/2021 01:36:19 PM spc_to_check = ['AB', 'AW', 'BD', 'BE', 'BF', 'BN', 'BW', 'BY', 'CB', 'CE', 'CW', 'EW', 'EX', 'HE', 'HI', 'IW', 'LA', 'MH', 'MR', 'MS', 'OB', 'OR', 'OW', 'OX', 'PB', 'PJ', 'PL', 'PO', 'PR', 'PS', 'PT', 'PW', 'SB', 'SN', 'SR', 'SW', 'SX']
+01/28/2021 01:36:19 PM spc_group_dict = {'AX': ['AB', 'AW'], 'BD': ['BD'], 'BE': ['BE'], 'BF': ['BF'], 'BN': ['BN'], 'BW': ['BW'], 'BY': ['BY'], 'CB': ['CB'], 'CE': ['CE', 'CW'], 'EX': ['EW', 'EX'], 'HE': ['HE'], 'HI': ['HI'], 'IW': ['IW'], 'LA': ['LA'], 'MH': ['MH'], 'MR': ['MR'], 'MS': ['MS'], 'OX': ['OB', 'OR', 'OW', 'OX'], 'PO': ['PB', 'PL', 'PO', 'PT'], 'PJ': ['PJ'], 'PX': ['PR', 'PS'], 'PW': ['PW'], 'SX': ['SB', 'SN', 'SR', 'SW', 'SX']}
+01/28/2021 01:36:19 PM 
+
+01/28/2021 01:36:19 PM --> Running csv2sqlite module
+01/28/2021 01:36:19 PM working on 'Cluster_Survey'
+01/28/2021 01:36:19 PM * WARNING: Cluster_Survey does not have latitude or longitude field.
+01/28/2021 01:36:19 PM In the table, Cluster_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 01:36:19 PM In the table, Cluster_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 01:36:19 PM Number of deleted records (test data): 34
+01/28/2021 01:36:19 PM 415 rows have been added to 'Cluster_Survey' table in the sqlite database.
+01/28/2021 01:36:19 PM working on 'Project_Survey'
+01/28/2021 01:36:19 PM * WARNING: Project_Survey does not have latitude or longitude field.
+01/28/2021 01:36:19 PM In the table, Project_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 01:36:19 PM In the table, Project_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 01:36:19 PM Number of deleted records (test data): 8
+01/28/2021 01:36:19 PM 13 rows have been added to 'Project_Survey' table in the sqlite database.
+01/28/2021 01:36:20 PM 
+
+01/28/2021 01:36:20 PM --> Running shp2sqlite module
+01/28/2021 01:36:20 PM Running dict_lst_to_sqlite() to create a new table called projects_shp
+01/28/2021 01:36:20 PM 28 rows have been successfully transferred to projects_shp.
+01/28/2021 01:36:20 PM 
+
+01/28/2021 01:36:20 PM --> Running determine_project_id module
+01/28/2021 01:36:20 PM Opened D:\ACTIVE\HomeOffice\RAP\script\Proj_shp\RAP_2020_Draft.shp
+01/28/2021 01:36:20 PM Adding geo check field
+01/28/2021 01:36:21 PM !!!! The following cluster surveys are not located within any project boundaries !!!!
+01/28/2021 01:36:21 PM !!!! Unique_id: 20, Cluster Num: 101, Lat Lon: 48.4970497340279, -81.3450264930725 !!!!
+01/28/2021 01:36:21 PM Populating (Updating) SQLite geo_check field with ProjectIDs
+01/28/2021 01:36:21 PM 
+
+01/28/2021 01:36:21 PM --> Running analysis module
+01/28/2021 01:36:21 PM Running Summarize_clusters method
+01/28/2021 01:36:21 PM Running dict_lst_to_sqlite() to create a new table called Cluster_Summary
+01/28/2021 01:36:21 PM 415 rows have been successfully transferred to Cluster_Summary.
+01/28/2021 01:36:22 PM Running summarize_projects method
+01/28/2021 01:36:22 PM !!!! multiple matching project survey records for ProjectID = b3 !!!!
+01/28/2021 01:36:22 PM !!!! multiple matching project survey records for ProjectID = Michaud132 !!!!
+01/28/2021 01:36:22 PM Running dict_lst_to_sqlite() to create a new table called Project_Summary
+01/28/2021 01:36:22 PM 28 rows have been successfully transferred to Project_Summary.
+01/28/2021 01:36:22 PM Running dict_lst_to_sqlite() to create a new table called Plot_Summary
+01/28/2021 01:36:25 PM 3320 rows have been successfully transferred to Plot_Summary.
+01/28/2021 01:36:25 PM Running dict_lst_to_sqlite() to create a new table called z_PBLK01
+01/28/2021 01:36:25 PM 47 rows have been successfully transferred to z_PBLK01.
+01/28/2021 01:36:25 PM Running dict_lst_to_sqlite() to create a new table called z_b3
+01/28/2021 01:36:25 PM 28 rows have been successfully transferred to z_b3.
+01/28/2021 01:36:25 PM Running dict_lst_to_sqlite() to create a new table called z_b6
+01/28/2021 01:36:25 PM 30 rows have been successfully transferred to z_b6.
+01/28/2021 01:36:26 PM Running dict_lst_to_sqlite() to create a new table called z_b4
+01/28/2021 01:36:26 PM 30 rows have been successfully transferred to z_b4.
+01/28/2021 01:36:26 PM Running dict_lst_to_sqlite() to create a new table called z_c3
+01/28/2021 01:36:26 PM 30 rows have been successfully transferred to z_c3.
+01/28/2021 01:36:26 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud132
+01/28/2021 01:36:26 PM 125 rows have been successfully transferred to z_Michaud132.
+01/28/2021 01:36:26 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud131
+01/28/2021 01:36:27 PM 29 rows have been successfully transferred to z_Michaud131.
+01/28/2021 01:36:27 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud130
+01/28/2021 01:36:27 PM 95 rows have been successfully transferred to z_Michaud130.
+01/28/2021 01:36:27 PM 
+
+01/28/2021 01:36:27 PM --> Running To_csv module
+01/28/2021 01:36:27 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 01:36:27 PM Running plot_to_csv method
+01/28/2021 01:36:27 PM Running clus_to_csv
+01/28/2021 01:36:27 PM 
+
+01/28/2021 01:36:27 PM --> Running to_browsers module
+01/28/2021 01:36:27 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 01:36:28 PM SEM program completed
+
+
+
+01/28/2021 01:37:10 PM ### ## #  Launching SEM program  # ## ###
+01/28/2021 01:37:10 PM Time: Jan 28, 2021. 01:37 PM
+01/28/2021 01:37:10 PM version 0.1
+01/28/2021 01:37:10 PM Stand-alone SEM.py run - TDT tool did not run!
+01/28/2021 01:37:10 PM Config file used: D:\ACTIVE\HomeOffice\RAP\script\SEM.cfg
+01/28/2021 01:37:10 PM Survey Data being used: D:\ACTIVE\HomeOffice\RAP_Outputs\raw_data\NER-RAP_28-Jan-21_10-48\data
+01/28/2021 01:37:10 PM All variables from the config file:
+{'CALC': {'default_plot_area': '8',
+          'max_height': '40',
+          'max_num_of_t_per_plot': '6',
+          'min_height': '0.5',
+          'num_of_plots': '8',
+          'num_of_trees_4_spcomp': '2'},
+ 'CSV': {'csvfolderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\raw_data\\NER-RAP_28-Jan-21_10-48\\data',
+         'dbfolderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\sqlite',
+         'output_csv_folderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\csv'},
+ 'LOG': {'debug': 'False'},
+ 'PDF': {'ref_folder': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\pdf_to_post\\ref',
+         'report_folder': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\pdf_to_post\\reports'},
+ 'SHP': {'area_ha_fieldname': 'Area_ha',
+         'dist_fieldname': 'District',
+         'fmu_fieldname': 'FMU',
+         'num_clus_fieldname': 'NumCluster',
+         'plot_size_fieldname': 'PlotSize_m',
+         'project_id_fieldname': 'ProjectID',
+         'project_shpfile': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\Proj_shp\\RAP_2020_Draft.shp',
+         'shp2sqlite_tablename': 'projects_shp'},
+ 'SPC': {'csv': 'SpeciesGroup.csv'},
+ 'SQLITE': {'clus_summary_tblname': 'Cluster_Summary',
+            'fin_proj_id': 'fin_proj_id',
+            'geo_check_fieldname': 'geo_proj_id',
+            'plot_summary_tblname': 'Plot_Summary',
+            'proj_id_override': 'ProjIDManualOverride',
+            'proj_summary_tblname': 'Project_Summary',
+            'unique_id_fieldname': 'unique_id'},
+ 'html': {'output_folder': 'D:\\ACTIVE\\HomeOffice\\RAP_outputs\\browser'}}
+01/28/2021 01:37:10 PM spc_to_check = ['AB', 'AW', 'BD', 'BE', 'BF', 'BN', 'BW', 'BY', 'CB', 'CE', 'CW', 'EW', 'EX', 'HE', 'HI', 'IW', 'LA', 'MH', 'MR', 'MS', 'OB', 'OR', 'OW', 'OX', 'PB', 'PJ', 'PL', 'PO', 'PR', 'PS', 'PT', 'PW', 'SB', 'SN', 'SR', 'SW', 'SX']
+01/28/2021 01:37:10 PM spc_group_dict = {'AX': ['AB', 'AW'], 'BD': ['BD'], 'BE': ['BE'], 'BF': ['BF'], 'BN': ['BN'], 'BW': ['BW'], 'BY': ['BY'], 'CB': ['CB'], 'CE': ['CE', 'CW'], 'EX': ['EW', 'EX'], 'HE': ['HE'], 'HI': ['HI'], 'IW': ['IW'], 'LA': ['LA'], 'MH': ['MH'], 'MR': ['MR'], 'MS': ['MS'], 'OX': ['OB', 'OR', 'OW', 'OX'], 'PO': ['PB', 'PL', 'PO', 'PT'], 'PJ': ['PJ'], 'PX': ['PR', 'PS'], 'PW': ['PW'], 'SX': ['SB', 'SN', 'SR', 'SW', 'SX']}
+01/28/2021 01:37:10 PM 
+
+01/28/2021 01:37:10 PM --> Running csv2sqlite module
+01/28/2021 01:37:10 PM working on 'Cluster_Survey'
+01/28/2021 01:37:10 PM * WARNING: Cluster_Survey does not have latitude or longitude field.
+01/28/2021 01:37:10 PM In the table, Cluster_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 01:37:10 PM In the table, Cluster_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 01:37:10 PM Number of deleted records (test data): 34
+01/28/2021 01:37:10 PM 415 rows have been added to 'Cluster_Survey' table in the sqlite database.
+01/28/2021 01:37:10 PM working on 'Project_Survey'
+01/28/2021 01:37:10 PM * WARNING: Project_Survey does not have latitude or longitude field.
+01/28/2021 01:37:10 PM In the table, Project_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 01:37:10 PM In the table, Project_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 01:37:10 PM Number of deleted records (test data): 8
+01/28/2021 01:37:10 PM 13 rows have been added to 'Project_Survey' table in the sqlite database.
+01/28/2021 01:37:10 PM 
+
+01/28/2021 01:37:10 PM --> Running shp2sqlite module
+01/28/2021 01:37:10 PM Running dict_lst_to_sqlite() to create a new table called projects_shp
+01/28/2021 01:37:11 PM 28 rows have been successfully transferred to projects_shp.
+01/28/2021 01:37:11 PM 
+
+01/28/2021 01:37:11 PM --> Running determine_project_id module
+01/28/2021 01:37:11 PM Opened D:\ACTIVE\HomeOffice\RAP\script\Proj_shp\RAP_2020_Draft.shp
+01/28/2021 01:37:11 PM Adding geo check field
+01/28/2021 01:37:12 PM !!!! The following cluster surveys are not located within any project boundaries !!!!
+01/28/2021 01:37:12 PM !!!! Unique_id: 20, Cluster Num: 101, Lat Lon: 48.4970497340279, -81.3450264930725 !!!!
+01/28/2021 01:37:12 PM Populating (Updating) SQLite geo_check field with ProjectIDs
+01/28/2021 01:37:12 PM 
+
+01/28/2021 01:37:12 PM --> Running analysis module
+01/28/2021 01:37:12 PM Running Summarize_clusters method
+01/28/2021 01:37:12 PM Running dict_lst_to_sqlite() to create a new table called Cluster_Summary
+01/28/2021 01:37:12 PM 415 rows have been successfully transferred to Cluster_Summary.
+01/28/2021 01:37:13 PM Running summarize_projects method
+01/28/2021 01:37:13 PM !!!! multiple matching project survey records for ProjectID = b3 !!!!
+01/28/2021 01:37:13 PM !!!! multiple matching project survey records for ProjectID = Michaud132 !!!!
+01/28/2021 01:37:13 PM Running dict_lst_to_sqlite() to create a new table called Project_Summary
+01/28/2021 01:37:13 PM 28 rows have been successfully transferred to Project_Summary.
+01/28/2021 01:37:13 PM Running dict_lst_to_sqlite() to create a new table called Plot_Summary
+01/28/2021 01:37:16 PM 3320 rows have been successfully transferred to Plot_Summary.
+01/28/2021 01:37:16 PM Running dict_lst_to_sqlite() to create a new table called z_PBLK01
+01/28/2021 01:37:16 PM 47 rows have been successfully transferred to z_PBLK01.
+01/28/2021 01:37:16 PM Running dict_lst_to_sqlite() to create a new table called z_b3
+01/28/2021 01:37:16 PM 28 rows have been successfully transferred to z_b3.
+01/28/2021 01:37:16 PM Running dict_lst_to_sqlite() to create a new table called z_b6
+01/28/2021 01:37:17 PM 30 rows have been successfully transferred to z_b6.
+01/28/2021 01:37:17 PM Running dict_lst_to_sqlite() to create a new table called z_b4
+01/28/2021 01:37:17 PM 30 rows have been successfully transferred to z_b4.
+01/28/2021 01:37:17 PM Running dict_lst_to_sqlite() to create a new table called z_c3
+01/28/2021 01:37:17 PM 30 rows have been successfully transferred to z_c3.
+01/28/2021 01:37:17 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud132
+01/28/2021 01:37:18 PM 125 rows have been successfully transferred to z_Michaud132.
+01/28/2021 01:37:18 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud131
+01/28/2021 01:37:18 PM 29 rows have been successfully transferred to z_Michaud131.
+01/28/2021 01:37:18 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud130
+01/28/2021 01:37:18 PM 95 rows have been successfully transferred to z_Michaud130.
+01/28/2021 01:37:18 PM 
+
+01/28/2021 01:37:18 PM --> Running To_csv module
+01/28/2021 01:37:18 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 01:37:18 PM Running plot_to_csv method
+01/28/2021 01:37:19 PM Running clus_to_csv
+01/28/2021 01:37:19 PM 
+
+01/28/2021 01:37:19 PM --> Running to_browsers module
+01/28/2021 01:37:19 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 01:37:19 PM SEM program completed
+
+
+
+01/28/2021 01:38:43 PM ### ## #  Launching SEM program  # ## ###
+01/28/2021 01:38:43 PM Time: Jan 28, 2021. 01:38 PM
+01/28/2021 01:38:43 PM version 0.1
+01/28/2021 01:38:43 PM Stand-alone SEM.py run - TDT tool did not run!
+01/28/2021 01:38:43 PM Config file used: D:\ACTIVE\HomeOffice\RAP\script\SEM.cfg
+01/28/2021 01:38:43 PM Survey Data being used: D:\ACTIVE\HomeOffice\RAP_Outputs\raw_data\NER-RAP_28-Jan-21_10-48\data
+01/28/2021 01:38:43 PM All variables from the config file:
+{'CALC': {'default_plot_area': '8',
+          'max_height': '40',
+          'max_num_of_t_per_plot': '6',
+          'min_height': '0.5',
+          'num_of_plots': '8',
+          'num_of_trees_4_spcomp': '2'},
+ 'CSV': {'csvfolderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\raw_data\\NER-RAP_28-Jan-21_10-48\\data',
+         'dbfolderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\sqlite',
+         'output_csv_folderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\csv'},
+ 'LOG': {'debug': 'False'},
+ 'PDF': {'ref_folder': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\pdf_to_post\\ref',
+         'report_folder': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\pdf_to_post\\reports'},
+ 'SHP': {'area_ha_fieldname': 'Area_ha',
+         'dist_fieldname': 'District',
+         'fmu_fieldname': 'FMU',
+         'num_clus_fieldname': 'NumCluster',
+         'plot_size_fieldname': 'PlotSize_m',
+         'project_id_fieldname': 'ProjectID',
+         'project_shpfile': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\Proj_shp\\RAP_2020_Draft.shp',
+         'shp2sqlite_tablename': 'projects_shp'},
+ 'SPC': {'csv': 'SpeciesGroup.csv'},
+ 'SQLITE': {'clus_summary_tblname': 'Cluster_Summary',
+            'fin_proj_id': 'fin_proj_id',
+            'geo_check_fieldname': 'geo_proj_id',
+            'plot_summary_tblname': 'Plot_Summary',
+            'proj_id_override': 'ProjIDManualOverride',
+            'proj_summary_tblname': 'Project_Summary',
+            'unique_id_fieldname': 'unique_id'},
+ 'html': {'output_folder': 'D:\\ACTIVE\\HomeOffice\\RAP_outputs\\browser'}}
+01/28/2021 01:38:43 PM spc_to_check = ['AB', 'AW', 'BD', 'BE', 'BF', 'BN', 'BW', 'BY', 'CB', 'CE', 'CW', 'EW', 'EX', 'HE', 'HI', 'IW', 'LA', 'MH', 'MR', 'MS', 'OB', 'OR', 'OW', 'OX', 'PB', 'PJ', 'PL', 'PO', 'PR', 'PS', 'PT', 'PW', 'SB', 'SN', 'SR', 'SW', 'SX']
+01/28/2021 01:38:43 PM spc_group_dict = {'AX': ['AB', 'AW'], 'BD': ['BD'], 'BE': ['BE'], 'BF': ['BF'], 'BN': ['BN'], 'BW': ['BW'], 'BY': ['BY'], 'CB': ['CB'], 'CE': ['CE', 'CW'], 'EX': ['EW', 'EX'], 'HE': ['HE'], 'HI': ['HI'], 'IW': ['IW'], 'LA': ['LA'], 'MH': ['MH'], 'MR': ['MR'], 'MS': ['MS'], 'OX': ['OB', 'OR', 'OW', 'OX'], 'PO': ['PB', 'PL', 'PO', 'PT'], 'PJ': ['PJ'], 'PX': ['PR', 'PS'], 'PW': ['PW'], 'SX': ['SB', 'SN', 'SR', 'SW', 'SX']}
+01/28/2021 01:38:43 PM 
+
+01/28/2021 01:38:43 PM --> Running csv2sqlite module
+01/28/2021 01:38:43 PM working on 'Cluster_Survey'
+01/28/2021 01:38:44 PM * WARNING: Cluster_Survey does not have latitude or longitude field.
+01/28/2021 01:38:44 PM In the table, Cluster_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 01:38:44 PM In the table, Cluster_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 01:38:44 PM Number of deleted records (test data): 34
+01/28/2021 01:38:44 PM 415 rows have been added to 'Cluster_Survey' table in the sqlite database.
+01/28/2021 01:38:44 PM working on 'Project_Survey'
+01/28/2021 01:38:44 PM * WARNING: Project_Survey does not have latitude or longitude field.
+01/28/2021 01:38:44 PM In the table, Project_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 01:38:44 PM In the table, Project_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 01:38:44 PM Number of deleted records (test data): 8
+01/28/2021 01:38:44 PM 13 rows have been added to 'Project_Survey' table in the sqlite database.
+01/28/2021 01:38:44 PM 
+
+01/28/2021 01:38:44 PM --> Running shp2sqlite module
+01/28/2021 01:38:44 PM Running dict_lst_to_sqlite() to create a new table called projects_shp
+01/28/2021 01:38:44 PM 28 rows have been successfully transferred to projects_shp.
+01/28/2021 01:38:44 PM 
+
+01/28/2021 01:38:44 PM --> Running determine_project_id module
+01/28/2021 01:38:44 PM Opened D:\ACTIVE\HomeOffice\RAP\script\Proj_shp\RAP_2020_Draft.shp
+01/28/2021 01:38:44 PM Adding geo check field
+01/28/2021 01:38:45 PM !!!! The following cluster surveys are not located within any project boundaries !!!!
+01/28/2021 01:38:45 PM !!!! Unique_id: 20, Cluster Num: 101, Lat Lon: 48.4970497340279, -81.3450264930725 !!!!
+01/28/2021 01:38:45 PM Populating (Updating) SQLite geo_check field with ProjectIDs
+01/28/2021 01:38:45 PM 
+
+01/28/2021 01:38:45 PM --> Running analysis module
+01/28/2021 01:38:46 PM Running Summarize_clusters method
+01/28/2021 01:38:46 PM Running dict_lst_to_sqlite() to create a new table called Cluster_Summary
+01/28/2021 01:38:46 PM 415 rows have been successfully transferred to Cluster_Summary.
+01/28/2021 01:38:46 PM Running summarize_projects method
+01/28/2021 01:38:46 PM !!!! multiple matching project survey records for ProjectID = b3 !!!!
+01/28/2021 01:38:46 PM !!!! multiple matching project survey records for ProjectID = Michaud132 !!!!
+01/28/2021 01:38:46 PM Running dict_lst_to_sqlite() to create a new table called Project_Summary
+01/28/2021 01:38:46 PM 28 rows have been successfully transferred to Project_Summary.
+01/28/2021 01:38:46 PM Running dict_lst_to_sqlite() to create a new table called Plot_Summary
+01/28/2021 01:38:49 PM 3320 rows have been successfully transferred to Plot_Summary.
+01/28/2021 01:38:49 PM Running dict_lst_to_sqlite() to create a new table called z_PBLK01
+01/28/2021 01:38:50 PM 47 rows have been successfully transferred to z_PBLK01.
+01/28/2021 01:38:50 PM Running dict_lst_to_sqlite() to create a new table called z_b3
+01/28/2021 01:38:50 PM 28 rows have been successfully transferred to z_b3.
+01/28/2021 01:38:50 PM Running dict_lst_to_sqlite() to create a new table called z_b6
+01/28/2021 01:38:50 PM 30 rows have been successfully transferred to z_b6.
+01/28/2021 01:38:50 PM Running dict_lst_to_sqlite() to create a new table called z_b4
+01/28/2021 01:38:50 PM 30 rows have been successfully transferred to z_b4.
+01/28/2021 01:38:51 PM Running dict_lst_to_sqlite() to create a new table called z_c3
+01/28/2021 01:38:51 PM 30 rows have been successfully transferred to z_c3.
+01/28/2021 01:38:51 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud132
+01/28/2021 01:38:51 PM 125 rows have been successfully transferred to z_Michaud132.
+01/28/2021 01:38:51 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud131
+01/28/2021 01:38:51 PM 29 rows have been successfully transferred to z_Michaud131.
+01/28/2021 01:38:51 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud130
+01/28/2021 01:38:52 PM 95 rows have been successfully transferred to z_Michaud130.
+01/28/2021 01:38:52 PM 
+
+01/28/2021 01:38:52 PM --> Running To_csv module
+01/28/2021 01:38:52 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 01:38:52 PM Running plot_to_csv method
+01/28/2021 01:38:52 PM Running clus_to_csv
+01/28/2021 01:38:52 PM 
+
+01/28/2021 01:38:52 PM --> Running to_browsers module
+01/28/2021 01:38:52 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 01:38:53 PM SEM program completed
+
+
+
+01/28/2021 01:40:08 PM ### ## #  Launching SEM program  # ## ###
+01/28/2021 01:40:08 PM Time: Jan 28, 2021. 01:40 PM
+01/28/2021 01:40:08 PM version 0.1
+01/28/2021 01:40:08 PM Stand-alone SEM.py run - TDT tool did not run!
+01/28/2021 01:40:08 PM Config file used: D:\ACTIVE\HomeOffice\RAP\script\SEM.cfg
+01/28/2021 01:40:08 PM Survey Data being used: D:\ACTIVE\HomeOffice\RAP_Outputs\raw_data\NER-RAP_28-Jan-21_10-48\data
+01/28/2021 01:40:08 PM All variables from the config file:
+{'CALC': {'default_plot_area': '8',
+          'max_height': '40',
+          'max_num_of_t_per_plot': '6',
+          'min_height': '0.5',
+          'num_of_plots': '8',
+          'num_of_trees_4_spcomp': '2'},
+ 'CSV': {'csvfolderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\raw_data\\NER-RAP_28-Jan-21_10-48\\data',
+         'dbfolderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\sqlite',
+         'output_csv_folderpath': 'D:\\ACTIVE\\HomeOffice\\RAP_Outputs\\csv'},
+ 'LOG': {'debug': 'False'},
+ 'PDF': {'ref_folder': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\pdf_to_post\\ref',
+         'report_folder': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\pdf_to_post\\reports'},
+ 'SHP': {'area_ha_fieldname': 'Area_ha',
+         'dist_fieldname': 'District',
+         'fmu_fieldname': 'FMU',
+         'num_clus_fieldname': 'NumCluster',
+         'plot_size_fieldname': 'PlotSize_m',
+         'project_id_fieldname': 'ProjectID',
+         'project_shpfile': 'D:\\ACTIVE\\HomeOffice\\RAP\\script\\Proj_shp\\RAP_2020_Draft.shp',
+         'shp2sqlite_tablename': 'projects_shp'},
+ 'SPC': {'csv': 'SpeciesGroup.csv'},
+ 'SQLITE': {'clus_summary_tblname': 'Cluster_Summary',
+            'fin_proj_id': 'fin_proj_id',
+            'geo_check_fieldname': 'geo_proj_id',
+            'plot_summary_tblname': 'Plot_Summary',
+            'proj_id_override': 'ProjIDManualOverride',
+            'proj_summary_tblname': 'Project_Summary',
+            'unique_id_fieldname': 'unique_id'},
+ 'html': {'output_folder': 'D:\\ACTIVE\\HomeOffice\\RAP_outputs\\browser'}}
+01/28/2021 01:40:08 PM spc_to_check = ['AB', 'AW', 'BD', 'BE', 'BF', 'BN', 'BW', 'BY', 'CB', 'CE', 'CW', 'EW', 'EX', 'HE', 'HI', 'IW', 'LA', 'MH', 'MR', 'MS', 'OB', 'OR', 'OW', 'OX', 'PB', 'PJ', 'PL', 'PO', 'PR', 'PS', 'PT', 'PW', 'SB', 'SN', 'SR', 'SW', 'SX']
+01/28/2021 01:40:08 PM spc_group_dict = {'AX': ['AB', 'AW'], 'BD': ['BD'], 'BE': ['BE'], 'BF': ['BF'], 'BN': ['BN'], 'BW': ['BW'], 'BY': ['BY'], 'CB': ['CB'], 'CE': ['CE', 'CW'], 'EX': ['EW', 'EX'], 'HE': ['HE'], 'HI': ['HI'], 'IW': ['IW'], 'LA': ['LA'], 'MH': ['MH'], 'MR': ['MR'], 'MS': ['MS'], 'OX': ['OB', 'OR', 'OW', 'OX'], 'PO': ['PB', 'PL', 'PO', 'PT'], 'PJ': ['PJ'], 'PX': ['PR', 'PS'], 'PW': ['PW'], 'SX': ['SB', 'SN', 'SR', 'SW', 'SX']}
+01/28/2021 01:40:08 PM 
+
+01/28/2021 01:40:08 PM --> Running csv2sqlite module
+01/28/2021 01:40:08 PM working on 'Cluster_Survey'
+01/28/2021 01:40:08 PM * WARNING: Cluster_Survey does not have latitude or longitude field.
+01/28/2021 01:40:08 PM In the table, Cluster_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 01:40:08 PM In the table, Cluster_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 01:40:08 PM Number of deleted records (test data): 34
+01/28/2021 01:40:08 PM 415 rows have been added to 'Cluster_Survey' table in the sqlite database.
+01/28/2021 01:40:09 PM working on 'Project_Survey'
+01/28/2021 01:40:09 PM * WARNING: Project_Survey does not have latitude or longitude field.
+01/28/2021 01:40:09 PM In the table, Project_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 01:40:09 PM In the table, Project_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 01:40:09 PM Number of deleted records (test data): 8
+01/28/2021 01:40:09 PM 13 rows have been added to 'Project_Survey' table in the sqlite database.
+01/28/2021 01:40:09 PM 
+
+01/28/2021 01:40:09 PM --> Running shp2sqlite module
+01/28/2021 01:40:09 PM Running dict_lst_to_sqlite() to create a new table called projects_shp
+01/28/2021 01:40:09 PM 28 rows have been successfully transferred to projects_shp.
+01/28/2021 01:40:09 PM 
+
+01/28/2021 01:40:09 PM --> Running determine_project_id module
+01/28/2021 01:40:09 PM Opened D:\ACTIVE\HomeOffice\RAP\script\Proj_shp\RAP_2020_Draft.shp
+01/28/2021 01:40:09 PM Adding geo check field
+01/28/2021 01:40:10 PM !!!! The following cluster surveys are not located within any project boundaries !!!!
+01/28/2021 01:40:10 PM !!!! Unique_id: 20, Cluster Num: 101, Lat Lon: 48.4970497340279, -81.3450264930725 !!!!
+01/28/2021 01:40:10 PM Populating (Updating) SQLite geo_check field with ProjectIDs
+01/28/2021 01:40:10 PM 
+
+01/28/2021 01:40:10 PM --> Running analysis module
+01/28/2021 01:40:10 PM Running Summarize_clusters method
+01/28/2021 01:40:10 PM Running dict_lst_to_sqlite() to create a new table called Cluster_Summary
+01/28/2021 01:40:11 PM 415 rows have been successfully transferred to Cluster_Summary.
+01/28/2021 01:40:11 PM Running summarize_projects method
+01/28/2021 01:40:11 PM !!!! multiple matching project survey records for ProjectID = b3 !!!!
+01/28/2021 01:40:11 PM !!!! multiple matching project survey records for ProjectID = Michaud132 !!!!
+01/28/2021 01:40:11 PM Running dict_lst_to_sqlite() to create a new table called Project_Summary
+01/28/2021 01:40:11 PM 28 rows have been successfully transferred to Project_Summary.
+01/28/2021 01:40:11 PM Running dict_lst_to_sqlite() to create a new table called Plot_Summary
+01/28/2021 01:40:14 PM 3320 rows have been successfully transferred to Plot_Summary.
+01/28/2021 01:40:14 PM Running dict_lst_to_sqlite() to create a new table called z_PBLK01
+01/28/2021 01:40:14 PM 47 rows have been successfully transferred to z_PBLK01.
+01/28/2021 01:40:14 PM Running dict_lst_to_sqlite() to create a new table called z_b3
+01/28/2021 01:40:15 PM 28 rows have been successfully transferred to z_b3.
+01/28/2021 01:40:15 PM Running dict_lst_to_sqlite() to create a new table called z_b6
+01/28/2021 01:40:15 PM 30 rows have been successfully transferred to z_b6.
+01/28/2021 01:40:15 PM Running dict_lst_to_sqlite() to create a new table called z_b4
+01/28/2021 01:40:15 PM 30 rows have been successfully transferred to z_b4.
+01/28/2021 01:40:15 PM Running dict_lst_to_sqlite() to create a new table called z_c3
+01/28/2021 01:40:15 PM 30 rows have been successfully transferred to z_c3.
+01/28/2021 01:40:16 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud132
+01/28/2021 01:40:16 PM 125 rows have been successfully transferred to z_Michaud132.
+01/28/2021 01:40:16 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud131
+01/28/2021 01:40:16 PM 29 rows have been successfully transferred to z_Michaud131.
+01/28/2021 01:40:16 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud130
+01/28/2021 01:40:17 PM 95 rows have been successfully transferred to z_Michaud130.
+01/28/2021 01:40:17 PM 
+
+01/28/2021 01:40:17 PM --> Running To_csv module
+01/28/2021 01:40:17 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 01:40:17 PM Running plot_to_csv method
+01/28/2021 01:40:17 PM Running clus_to_csv
+01/28/2021 01:40:17 PM 
+
+01/28/2021 01:40:17 PM --> Running to_browsers module
+01/28/2021 01:40:17 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 01:40:18 PM SEM program completed
+
+
+
+01/28/2021 03:27:23 PM ### ## #  Launching SEM program  # ## ###
+01/28/2021 03:27:23 PM Time: Jan 28, 2021. 03:27 PM
+01/28/2021 03:27:23 PM version 0.1
+01/28/2021 03:27:23 PM Stand-alone SEM.py run - TDT tool did not run!
+01/28/2021 03:27:23 PM Config file used: C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP\script\SEM.cfg
+01/28/2021 03:27:23 PM Survey Data being used: C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP_rawdata\NER-RAP_28-Jan-21_10-48\data
+01/28/2021 03:27:23 PM All variables from the config file:
+{'CALC': {'default_plot_area': '8',
+          'max_height': '40',
+          'max_num_of_t_per_plot': '6',
+          'min_height': '0.5',
+          'num_of_plots': '8',
+          'num_of_trees_4_spcomp': '2'},
+ 'CSV': {'csvfolderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                          'Ontario\\2021\\RAP_rawdata\\NER-RAP_28-Jan-21_10-48\\data',
+         'dbfolderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                         'Ontario\\2021\\RAP_Outputs\\2021_01\\sqlite',
+         'output_csv_folderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                                  'Ontario\\2021\\RAP_Outputs\\2021_01\\csv'},
+ 'LOG': {'debug': 'False'},
+ 'PDF': {'ref_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                       'Ontario\\2021\\RAP\\script\\pdf_to_post\\ref',
+         'report_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                          'Ontario\\2021\\RAP\\script\\pdf_to_post\\reports'},
+ 'SHP': {'area_ha_fieldname': 'Area_ha',
+         'dist_fieldname': 'District',
+         'fmu_fieldname': 'FMU',
+         'num_clus_fieldname': 'NumCluster',
+         'plot_size_fieldname': 'PlotSize_m',
+         'project_id_fieldname': 'ProjectID',
+         'project_shpfile': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                            'Ontario\\2021\\RAP\\script\\Proj_shp\\RAP_2020_Draft.shp',
+         'shp2sqlite_tablename': 'projects_shp'},
+ 'SPC': {'csv': 'SpeciesGroup.csv'},
+ 'SQLITE': {'clus_summary_tblname': 'Cluster_Summary',
+            'fin_proj_id': 'fin_proj_id',
+            'geo_check_fieldname': 'geo_proj_id',
+            'plot_summary_tblname': 'Plot_Summary',
+            'proj_id_override': 'ProjIDManualOverride',
+            'proj_summary_tblname': 'Project_Summary',
+            'unique_id_fieldname': 'unique_id'},
+ 'html': {'output_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                           'Ontario\\2021\\RAP_Outputs\\2021_01\\browser'}}
+01/28/2021 03:27:23 PM spc_to_check = ['AB', 'AW', 'BD', 'BE', 'BF', 'BN', 'BW', 'BY', 'CB', 'CE', 'CW', 'EW', 'EX', 'HE', 'HI', 'IW', 'LA', 'MH', 'MR', 'MS', 'OB', 'OR', 'OW', 'OX', 'PB', 'PJ', 'PL', 'PO', 'PR', 'PS', 'PT', 'PW', 'SB', 'SN', 'SR', 'SW', 'SX']
+01/28/2021 03:27:23 PM spc_group_dict = {'AX': ['AB', 'AW'], 'BD': ['BD'], 'BE': ['BE'], 'BF': ['BF'], 'BN': ['BN'], 'BW': ['BW'], 'BY': ['BY'], 'CB': ['CB'], 'CE': ['CE', 'CW'], 'EX': ['EW', 'EX'], 'HE': ['HE'], 'HI': ['HI'], 'IW': ['IW'], 'LA': ['LA'], 'MH': ['MH'], 'MR': ['MR'], 'MS': ['MS'], 'OX': ['OB', 'OR', 'OW', 'OX'], 'PO': ['PB', 'PL', 'PO', 'PT'], 'PJ': ['PJ'], 'PX': ['PR', 'PS'], 'PW': ['PW'], 'SX': ['SB', 'SN', 'SR', 'SW', 'SX']}
+01/28/2021 03:27:23 PM 
+
+01/28/2021 03:27:23 PM --> Running csv2sqlite module
+01/28/2021 03:27:23 PM working on 'Cluster_Survey'
+01/28/2021 03:27:23 PM * WARNING: Cluster_Survey does not have latitude or longitude field.
+01/28/2021 03:27:23 PM In the table, Cluster_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 03:27:23 PM In the table, Cluster_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 03:27:23 PM Number of deleted records (test data): 34
+01/28/2021 03:27:23 PM 415 rows have been added to 'Cluster_Survey' table in the sqlite database.
+01/28/2021 03:27:23 PM working on 'Project_Survey'
+01/28/2021 03:27:23 PM * WARNING: Project_Survey does not have latitude or longitude field.
+01/28/2021 03:27:23 PM In the table, Project_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 03:27:23 PM In the table, Project_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 03:27:23 PM Number of deleted records (test data): 8
+01/28/2021 03:27:23 PM 13 rows have been added to 'Project_Survey' table in the sqlite database.
+01/28/2021 03:27:23 PM 
+
+01/28/2021 03:27:23 PM --> Running shp2sqlite module
+01/28/2021 03:27:23 PM Running dict_lst_to_sqlite() to create a new table called projects_shp
+01/28/2021 03:27:23 PM 28 rows have been successfully transferred to projects_shp.
+01/28/2021 03:27:23 PM 
+
+01/28/2021 03:27:23 PM --> Running determine_project_id module
+01/28/2021 03:27:23 PM Opened C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP\script\Proj_shp\RAP_2020_Draft.shp
+01/28/2021 03:27:23 PM Adding geo check field
+01/28/2021 03:27:25 PM !!!! The following cluster surveys are not located within any project boundaries !!!!
+01/28/2021 03:27:25 PM !!!! Unique_id: 20, Cluster Num: 101, Lat Lon: 48.4970497340279, -81.3450264930725 !!!!
+01/28/2021 03:27:25 PM Populating (Updating) SQLite geo_check field with ProjectIDs
+01/28/2021 03:27:25 PM 
+
+01/28/2021 03:27:25 PM --> Running analysis module
+01/28/2021 03:27:25 PM Running Summarize_clusters method
+01/28/2021 03:27:25 PM Running dict_lst_to_sqlite() to create a new table called Cluster_Summary
+01/28/2021 03:27:25 PM 415 rows have been successfully transferred to Cluster_Summary.
+01/28/2021 03:27:25 PM Running summarize_projects method
+01/28/2021 03:27:25 PM !!!! multiple matching project survey records for ProjectID = b3 !!!!
+01/28/2021 03:27:25 PM !!!! multiple matching project survey records for ProjectID = Michaud132 !!!!
+01/28/2021 03:27:26 PM Running dict_lst_to_sqlite() to create a new table called Project_Summary
+01/28/2021 03:27:26 PM 28 rows have been successfully transferred to Project_Summary.
+01/28/2021 03:27:26 PM Running dict_lst_to_sqlite() to create a new table called Plot_Summary
+01/28/2021 03:27:30 PM 3320 rows have been successfully transferred to Plot_Summary.
+01/28/2021 03:27:30 PM Running dict_lst_to_sqlite() to create a new table called z_PBLK01
+01/28/2021 03:27:30 PM 47 rows have been successfully transferred to z_PBLK01.
+01/28/2021 03:27:30 PM Running dict_lst_to_sqlite() to create a new table called z_b3
+01/28/2021 03:27:30 PM 28 rows have been successfully transferred to z_b3.
+01/28/2021 03:27:30 PM Running dict_lst_to_sqlite() to create a new table called z_b6
+01/28/2021 03:27:30 PM 30 rows have been successfully transferred to z_b6.
+01/28/2021 03:27:30 PM Running dict_lst_to_sqlite() to create a new table called z_b4
+01/28/2021 03:27:30 PM 30 rows have been successfully transferred to z_b4.
+01/28/2021 03:27:30 PM Running dict_lst_to_sqlite() to create a new table called z_c3
+01/28/2021 03:27:30 PM 30 rows have been successfully transferred to z_c3.
+01/28/2021 03:27:30 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud132
+01/28/2021 03:27:30 PM 125 rows have been successfully transferred to z_Michaud132.
+01/28/2021 03:27:30 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud131
+01/28/2021 03:27:30 PM 29 rows have been successfully transferred to z_Michaud131.
+01/28/2021 03:27:30 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud130
+01/28/2021 03:27:31 PM 95 rows have been successfully transferred to z_Michaud130.
+01/28/2021 03:27:31 PM 
+
+01/28/2021 03:27:31 PM --> Running To_csv module
+01/28/2021 03:27:31 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 03:27:31 PM Running plot_to_csv method
+01/28/2021 03:27:31 PM Running clus_to_csv
+01/28/2021 03:27:31 PM 
+
+01/28/2021 03:27:31 PM --> Running to_browsers module
+01/28/2021 03:27:31 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 03:27:32 PM SEM program completed
+
+
+
+01/28/2021 03:29:27 PM ### ## #  Launching SEM program  # ## ###
+01/28/2021 03:29:27 PM Time: Jan 28, 2021. 03:29 PM
+01/28/2021 03:29:27 PM version 0.1
+01/28/2021 03:29:27 PM Stand-alone SEM.py run - TDT tool did not run!
+01/28/2021 03:29:27 PM Config file used: SEM.cfg
+01/28/2021 03:29:27 PM Survey Data being used: C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP_rawdata\NER-RAP_28-Jan-21_10-48\data
+01/28/2021 03:29:27 PM All variables from the config file:
+{'CALC': {'default_plot_area': '8',
+          'max_height': '40',
+          'max_num_of_t_per_plot': '6',
+          'min_height': '0.5',
+          'num_of_plots': '8',
+          'num_of_trees_4_spcomp': '2'},
+ 'CSV': {'csvfolderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                          'Ontario\\2021\\RAP_rawdata\\NER-RAP_28-Jan-21_10-48\\data',
+         'dbfolderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                         'Ontario\\2021\\RAP_Outputs\\2021_01\\sqlite',
+         'output_csv_folderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                                  'Ontario\\2021\\RAP_Outputs\\2021_01\\csv'},
+ 'LOG': {'debug': 'False'},
+ 'PDF': {'ref_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                       'Ontario\\2021\\RAP\\script\\pdf_to_post\\ref',
+         'report_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                          'Ontario\\2021\\RAP\\script\\pdf_to_post\\reports'},
+ 'SHP': {'area_ha_fieldname': 'Area_ha',
+         'dist_fieldname': 'District',
+         'fmu_fieldname': 'FMU',
+         'num_clus_fieldname': 'NumCluster',
+         'plot_size_fieldname': 'PlotSize_m',
+         'project_id_fieldname': 'ProjectID',
+         'project_shpfile': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                            'Ontario\\2021\\RAP\\script\\Proj_shp\\RAP_2020_Draft.shp',
+         'shp2sqlite_tablename': 'projects_shp'},
+ 'SPC': {'csv': 'SpeciesGroup.csv'},
+ 'SQLITE': {'clus_summary_tblname': 'Cluster_Summary',
+            'fin_proj_id': 'fin_proj_id',
+            'geo_check_fieldname': 'geo_proj_id',
+            'plot_summary_tblname': 'Plot_Summary',
+            'proj_id_override': 'ProjIDManualOverride',
+            'proj_summary_tblname': 'Project_Summary',
+            'unique_id_fieldname': 'unique_id'},
+ 'html': {'output_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                           'Ontario\\2021\\RAP_Outputs\\2021_01\\browser'}}
+01/28/2021 03:29:27 PM spc_to_check = ['AB', 'AW', 'BD', 'BE', 'BF', 'BN', 'BW', 'BY', 'CB', 'CE', 'CW', 'EW', 'EX', 'HE', 'HI', 'IW', 'LA', 'MH', 'MR', 'MS', 'OB', 'OR', 'OW', 'OX', 'PB', 'PJ', 'PL', 'PO', 'PR', 'PS', 'PT', 'PW', 'SB', 'SN', 'SR', 'SW', 'SX']
+01/28/2021 03:29:27 PM spc_group_dict = {'AX': ['AB', 'AW'], 'BD': ['BD'], 'BE': ['BE'], 'BF': ['BF'], 'BN': ['BN'], 'BW': ['BW'], 'BY': ['BY'], 'CB': ['CB'], 'CE': ['CE', 'CW'], 'EX': ['EW', 'EX'], 'HE': ['HE'], 'HI': ['HI'], 'IW': ['IW'], 'LA': ['LA'], 'MH': ['MH'], 'MR': ['MR'], 'MS': ['MS'], 'OX': ['OB', 'OR', 'OW', 'OX'], 'PO': ['PB', 'PL', 'PO', 'PT'], 'PJ': ['PJ'], 'PX': ['PR', 'PS'], 'PW': ['PW'], 'SX': ['SB', 'SN', 'SR', 'SW', 'SX']}
+01/28/2021 03:29:27 PM 
+
+01/28/2021 03:29:27 PM --> Running csv2sqlite module
+01/28/2021 03:29:27 PM working on 'Cluster_Survey'
+01/28/2021 03:29:27 PM * WARNING: Cluster_Survey does not have latitude or longitude field.
+01/28/2021 03:29:27 PM In the table, Cluster_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 03:29:27 PM In the table, Cluster_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 03:29:27 PM Number of deleted records (test data): 34
+01/28/2021 03:29:27 PM 415 rows have been added to 'Cluster_Survey' table in the sqlite database.
+01/28/2021 03:29:27 PM working on 'Project_Survey'
+01/28/2021 03:29:27 PM * WARNING: Project_Survey does not have latitude or longitude field.
+01/28/2021 03:29:27 PM In the table, Project_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 03:29:27 PM In the table, Project_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 03:29:27 PM Number of deleted records (test data): 8
+01/28/2021 03:29:27 PM 13 rows have been added to 'Project_Survey' table in the sqlite database.
+01/28/2021 03:29:27 PM 
+
+01/28/2021 03:29:27 PM --> Running shp2sqlite module
+01/28/2021 03:29:27 PM Running dict_lst_to_sqlite() to create a new table called projects_shp
+01/28/2021 03:29:27 PM 28 rows have been successfully transferred to projects_shp.
+01/28/2021 03:29:27 PM 
+
+01/28/2021 03:29:27 PM --> Running determine_project_id module
+01/28/2021 03:29:27 PM Opened C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP\script\Proj_shp\RAP_2020_Draft.shp
+01/28/2021 03:29:27 PM Adding geo check field
+01/28/2021 03:29:28 PM !!!! The following cluster surveys are not located within any project boundaries !!!!
+01/28/2021 03:29:28 PM !!!! Unique_id: 20, Cluster Num: 101, Lat Lon: 48.4970497340279, -81.3450264930725 !!!!
+01/28/2021 03:29:28 PM Populating (Updating) SQLite geo_check field with ProjectIDs
+01/28/2021 03:29:28 PM 
+
+01/28/2021 03:29:28 PM --> Running analysis module
+01/28/2021 03:29:29 PM Running Summarize_clusters method
+01/28/2021 03:29:29 PM Running dict_lst_to_sqlite() to create a new table called Cluster_Summary
+01/28/2021 03:29:29 PM 415 rows have been successfully transferred to Cluster_Summary.
+01/28/2021 03:29:29 PM Running summarize_projects method
+01/28/2021 03:29:29 PM !!!! multiple matching project survey records for ProjectID = b3 !!!!
+01/28/2021 03:29:29 PM !!!! multiple matching project survey records for ProjectID = Michaud132 !!!!
+01/28/2021 03:29:29 PM Running dict_lst_to_sqlite() to create a new table called Project_Summary
+01/28/2021 03:29:29 PM 28 rows have been successfully transferred to Project_Summary.
+01/28/2021 03:29:29 PM Running dict_lst_to_sqlite() to create a new table called Plot_Summary
+01/28/2021 03:29:32 PM 3320 rows have been successfully transferred to Plot_Summary.
+01/28/2021 03:29:32 PM Running dict_lst_to_sqlite() to create a new table called z_PBLK01
+01/28/2021 03:29:32 PM 47 rows have been successfully transferred to z_PBLK01.
+01/28/2021 03:29:32 PM Running dict_lst_to_sqlite() to create a new table called z_b3
+01/28/2021 03:29:33 PM 28 rows have been successfully transferred to z_b3.
+01/28/2021 03:29:33 PM Running dict_lst_to_sqlite() to create a new table called z_b6
+01/28/2021 03:29:33 PM 30 rows have been successfully transferred to z_b6.
+01/28/2021 03:29:33 PM Running dict_lst_to_sqlite() to create a new table called z_b4
+01/28/2021 03:29:33 PM 30 rows have been successfully transferred to z_b4.
+01/28/2021 03:29:33 PM Running dict_lst_to_sqlite() to create a new table called z_c3
+01/28/2021 03:29:33 PM 30 rows have been successfully transferred to z_c3.
+01/28/2021 03:29:33 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud132
+01/28/2021 03:29:33 PM 125 rows have been successfully transferred to z_Michaud132.
+01/28/2021 03:29:33 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud131
+01/28/2021 03:29:33 PM 29 rows have been successfully transferred to z_Michaud131.
+01/28/2021 03:29:33 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud130
+01/28/2021 03:29:33 PM 95 rows have been successfully transferred to z_Michaud130.
+01/28/2021 03:29:33 PM 
+
+01/28/2021 03:29:33 PM --> Running To_csv module
+01/28/2021 03:29:33 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 03:29:33 PM Running plot_to_csv method
+01/28/2021 03:29:33 PM Running clus_to_csv
+01/28/2021 03:29:34 PM 
+
+01/28/2021 03:29:34 PM --> Running to_browsers module
+01/28/2021 03:29:34 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 03:29:35 PM SEM program completed
+
+
+
+01/28/2021 03:33:45 PM ### ## #  Launching SEM program  # ## ###
+01/28/2021 03:33:45 PM Time: Jan 28, 2021. 03:33 PM
+01/28/2021 03:33:45 PM version 0.1
+01/28/2021 03:33:45 PM Stand-alone SEM.py run - TDT tool did not run!
+01/28/2021 03:33:45 PM Config file used: SEM.cfg
+01/28/2021 03:33:45 PM Survey Data being used: C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP_rawdata\NER-RAP_28-Jan-21_10-48\data
+01/28/2021 03:33:45 PM All variables from the config file:
+{'CALC': {'default_plot_area': '8',
+          'max_height': '40',
+          'max_num_of_t_per_plot': '6',
+          'min_height': '0.5',
+          'num_of_plots': '8',
+          'num_of_trees_4_spcomp': '2'},
+ 'CSV': {'csvfolderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                          'Ontario\\2021\\RAP_rawdata\\NER-RAP_28-Jan-21_10-48\\data',
+         'dbfolderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                         'Ontario\\2021\\RAP_Outputs\\2021_01\\sqlite',
+         'output_csv_folderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                                  'Ontario\\2021\\RAP_Outputs\\2021_01\\csv'},
+ 'LOG': {'debug': 'False'},
+ 'PDF': {'ref_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                       'Ontario\\2021\\RAP\\script\\pdf_to_post\\ref',
+         'report_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                          'Ontario\\2021\\RAP\\script\\pdf_to_post\\reports'},
+ 'SHP': {'area_ha_fieldname': 'Area_ha',
+         'dist_fieldname': 'District',
+         'fmu_fieldname': 'FMU',
+         'num_clus_fieldname': 'NumCluster',
+         'plot_size_fieldname': 'PlotSize_m',
+         'project_id_fieldname': 'ProjectID',
+         'project_shpfile': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                            'Ontario\\2021\\RAP\\script\\Proj_shp\\RAP_2020_Draft.shp',
+         'shp2sqlite_tablename': 'projects_shp'},
+ 'SPC': {'csv': 'SpeciesGroup.csv'},
+ 'SQLITE': {'clus_summary_tblname': 'Cluster_Summary',
+            'fin_proj_id': 'fin_proj_id',
+            'geo_check_fieldname': 'geo_proj_id',
+            'plot_summary_tblname': 'Plot_Summary',
+            'proj_id_override': 'ProjIDManualOverride',
+            'proj_summary_tblname': 'Project_Summary',
+            'unique_id_fieldname': 'unique_id'},
+ 'html': {'output_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                           'Ontario\\2021\\RAP_Outputs\\2021_01\\browser'}}
+01/28/2021 03:33:45 PM spc_to_check = ['AB', 'AW', 'BD', 'BE', 'BF', 'BN', 'BW', 'BY', 'CB', 'CE', 'CW', 'EW', 'EX', 'HE', 'HI', 'IW', 'LA', 'MH', 'MR', 'MS', 'OB', 'OR', 'OW', 'OX', 'PB', 'PJ', 'PL', 'PO', 'PR', 'PS', 'PT', 'PW', 'SB', 'SN', 'SR', 'SW', 'SX']
+01/28/2021 03:33:45 PM spc_group_dict = {'AX': ['AB', 'AW'], 'BD': ['BD'], 'BE': ['BE'], 'BF': ['BF'], 'BN': ['BN'], 'BW': ['BW'], 'BY': ['BY'], 'CB': ['CB'], 'CE': ['CE', 'CW'], 'EX': ['EW', 'EX'], 'HE': ['HE'], 'HI': ['HI'], 'IW': ['IW'], 'LA': ['LA'], 'MH': ['MH'], 'MR': ['MR'], 'MS': ['MS'], 'OX': ['OB', 'OR', 'OW', 'OX'], 'PO': ['PB', 'PL', 'PO', 'PT'], 'PJ': ['PJ'], 'PX': ['PR', 'PS'], 'PW': ['PW'], 'SX': ['SB', 'SN', 'SR', 'SW', 'SX']}
+01/28/2021 03:33:45 PM 
+
+01/28/2021 03:33:45 PM --> Running csv2sqlite module
+01/28/2021 03:33:45 PM working on 'Cluster_Survey'
+01/28/2021 03:33:45 PM * WARNING: Cluster_Survey does not have latitude or longitude field.
+01/28/2021 03:33:45 PM In the table, Cluster_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 03:33:45 PM In the table, Cluster_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 03:33:45 PM Number of deleted records (test data): 34
+01/28/2021 03:33:45 PM 415 rows have been added to 'Cluster_Survey' table in the sqlite database.
+01/28/2021 03:33:45 PM working on 'Project_Survey'
+01/28/2021 03:33:45 PM * WARNING: Project_Survey does not have latitude or longitude field.
+01/28/2021 03:33:45 PM In the table, Project_Survey, fieldname 'X' has been renamed to 'longitude'
+01/28/2021 03:33:45 PM In the table, Project_Survey, fieldname 'Y' has been renamed to 'latitude'
+01/28/2021 03:33:45 PM Number of deleted records (test data): 8
+01/28/2021 03:33:45 PM 13 rows have been added to 'Project_Survey' table in the sqlite database.
+01/28/2021 03:33:45 PM 
+
+01/28/2021 03:33:45 PM --> Running shp2sqlite module
+01/28/2021 03:33:45 PM Running dict_lst_to_sqlite() to create a new table called projects_shp
+01/28/2021 03:33:45 PM 28 rows have been successfully transferred to projects_shp.
+01/28/2021 03:33:45 PM 
+
+01/28/2021 03:33:45 PM --> Running determine_project_id module
+01/28/2021 03:33:45 PM Opened C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP\script\Proj_shp\RAP_2020_Draft.shp
+01/28/2021 03:33:45 PM Adding geo check field
+01/28/2021 03:33:46 PM !!!! The following cluster surveys are not located within any project boundaries !!!!
+01/28/2021 03:33:46 PM !!!! Unique_id: 20, Cluster Num: 101, Lat Lon: 48.4970497340279, -81.3450264930725 !!!!
+01/28/2021 03:33:46 PM Populating (Updating) SQLite geo_check field with ProjectIDs
+01/28/2021 03:33:46 PM 
+
+01/28/2021 03:33:46 PM --> Running analysis module
+01/28/2021 03:33:46 PM Running Summarize_clusters method
+01/28/2021 03:33:46 PM Running dict_lst_to_sqlite() to create a new table called Cluster_Summary
+01/28/2021 03:33:46 PM 415 rows have been successfully transferred to Cluster_Summary.
+01/28/2021 03:33:46 PM Running summarize_projects method
+01/28/2021 03:33:46 PM !!!! multiple matching project survey records for ProjectID = b3 !!!!
+01/28/2021 03:33:46 PM !!!! multiple matching project survey records for ProjectID = Michaud132 !!!!
+01/28/2021 03:33:46 PM Running dict_lst_to_sqlite() to create a new table called Project_Summary
+01/28/2021 03:33:46 PM 28 rows have been successfully transferred to Project_Summary.
+01/28/2021 03:33:46 PM Running dict_lst_to_sqlite() to create a new table called Plot_Summary
+01/28/2021 03:33:48 PM 3320 rows have been successfully transferred to Plot_Summary.
+01/28/2021 03:33:48 PM Running dict_lst_to_sqlite() to create a new table called z_PBLK01
+01/28/2021 03:33:48 PM 47 rows have been successfully transferred to z_PBLK01.
+01/28/2021 03:33:48 PM Running dict_lst_to_sqlite() to create a new table called z_b3
+01/28/2021 03:33:48 PM 28 rows have been successfully transferred to z_b3.
+01/28/2021 03:33:48 PM Running dict_lst_to_sqlite() to create a new table called z_b6
+01/28/2021 03:33:48 PM 30 rows have been successfully transferred to z_b6.
+01/28/2021 03:33:48 PM Running dict_lst_to_sqlite() to create a new table called z_b4
+01/28/2021 03:33:48 PM 30 rows have been successfully transferred to z_b4.
+01/28/2021 03:33:48 PM Running dict_lst_to_sqlite() to create a new table called z_c3
+01/28/2021 03:33:48 PM 30 rows have been successfully transferred to z_c3.
+01/28/2021 03:33:48 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud132
+01/28/2021 03:33:48 PM 125 rows have been successfully transferred to z_Michaud132.
+01/28/2021 03:33:48 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud131
+01/28/2021 03:33:48 PM 29 rows have been successfully transferred to z_Michaud131.
+01/28/2021 03:33:48 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud130
+01/28/2021 03:33:48 PM 95 rows have been successfully transferred to z_Michaud130.
+01/28/2021 03:33:48 PM 
+
+01/28/2021 03:33:48 PM --> Running To_csv module
+01/28/2021 03:33:49 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 03:33:49 PM Running plot_to_csv method
+01/28/2021 03:33:49 PM Running clus_to_csv
+01/28/2021 03:33:49 PM 
+
+01/28/2021 03:33:49 PM --> Running to_browsers module
+01/28/2021 03:33:49 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+01/28/2021 03:33:49 PM SEM program completed
+
+
+
+03/21/2021 09:26:34 PM ### ## #  Launching SEM program  # ## ###
+03/21/2021 09:26:34 PM Time: Mar 21, 2021. 09:26 PM
+03/21/2021 09:26:34 PM version 0.1
+03/21/2021 09:26:34 PM Stand-alone SEM.py run - TDT tool did not run!
+03/21/2021 09:26:34 PM Config file used: SEM.cfg
+03/21/2021 09:26:34 PM Survey Data being used: C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP_rawdata\NER-RAP_28-Jan-21_10-48\data
+03/21/2021 09:26:34 PM All variables from the config file:
+{'CALC': {'default_plot_area': '8',
+          'max_height': '40',
+          'max_num_of_t_per_plot': '6',
+          'min_height': '0.5',
+          'num_of_plots': '8',
+          'num_of_trees_4_spcomp': '2'},
+ 'CSV': {'csvfolderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                          'Ontario\\2021\\RAP_rawdata\\NER-RAP_28-Jan-21_10-48\\data',
+         'dbfolderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                         'Ontario\\2021\\RAP_Outputs\\2021_01\\sqlite',
+         'output_csv_folderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                                  'Ontario\\2021\\RAP_Outputs\\2021_01\\csv'},
+ 'LOG': {'debug': 'False'},
+ 'PDF': {'ref_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                       'Ontario\\2021\\RAP\\script\\pdf_to_post\\ref',
+         'report_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                          'Ontario\\2021\\RAP\\script\\pdf_to_post\\reports'},
+ 'SHP': {'area_ha_fieldname': 'Area_ha',
+         'dist_fieldname': 'District',
+         'fmu_fieldname': 'FMU',
+         'num_clus_fieldname': 'NumCluster',
+         'plot_size_fieldname': 'PlotSize_m',
+         'project_id_fieldname': 'ProjectID',
+         'project_shpfile': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                            'Ontario\\2021\\RAP\\script\\Proj_shp\\RAP_2020_Draft.shp',
+         'shp2sqlite_tablename': 'projects_shp'},
+ 'SPC': {'csv': 'SpeciesGroup.csv'},
+ 'SQLITE': {'clus_summary_tblname': 'Cluster_Summary',
+            'fin_proj_id': 'fin_proj_id',
+            'geo_check_fieldname': 'geo_proj_id',
+            'plot_summary_tblname': 'Plot_Summary',
+            'proj_id_override': 'ProjIDManualOverride',
+            'proj_summary_tblname': 'Project_Summary',
+            'unique_id_fieldname': 'unique_id'},
+ 'html': {'output_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                           'Ontario\\2021\\RAP_Outputs\\2021_01\\browser'}}
+03/21/2021 09:26:34 PM spc_to_check = ['AB', 'AW', 'BD', 'BE', 'BF', 'BN', 'BW', 'BY', 'CB', 'CE', 'CW', 'EW', 'EX', 'HE', 'HI', 'IW', 'LA', 'MH', 'MR', 'MS', 'OB', 'OR', 'OW', 'OX', 'PB', 'PJ', 'PL', 'PO', 'PR', 'PS', 'PT', 'PW', 'SB', 'SN', 'SR', 'SW', 'SX']
+03/21/2021 09:26:34 PM spc_group_dict = {'AX': ['AB', 'AW'], 'BD': ['BD'], 'BE': ['BE'], 'BF': ['BF'], 'BN': ['BN'], 'BW': ['BW'], 'BY': ['BY'], 'CB': ['CB'], 'CE': ['CE', 'CW'], 'EX': ['EW', 'EX'], 'HE': ['HE'], 'HI': ['HI'], 'IW': ['IW'], 'LA': ['LA'], 'MH': ['MH'], 'MR': ['MR'], 'MS': ['MS'], 'OX': ['OB', 'OR', 'OW', 'OX'], 'PO': ['PB', 'PL', 'PO', 'PT'], 'PJ': ['PJ'], 'PX': ['PR', 'PS'], 'PW': ['PW'], 'SX': ['SB', 'SN', 'SR', 'SW', 'SX']}
+03/21/2021 09:26:34 PM 
+
+03/21/2021 09:26:34 PM --> Running csv2sqlite module
+03/21/2021 09:26:34 PM working on 'Cluster_Survey'
+03/21/2021 09:26:34 PM * WARNING: Cluster_Survey does not have latitude or longitude field.
+03/21/2021 09:26:34 PM In the table, Cluster_Survey, fieldname 'X' has been renamed to 'longitude'
+03/21/2021 09:26:34 PM In the table, Cluster_Survey, fieldname 'Y' has been renamed to 'latitude'
+03/21/2021 09:26:34 PM Number of deleted records (test data): 34
+03/21/2021 09:26:34 PM 415 rows have been added to 'Cluster_Survey' table in the sqlite database.
+03/21/2021 09:26:34 PM working on 'Project_Survey'
+03/21/2021 09:26:34 PM * WARNING: Project_Survey does not have latitude or longitude field.
+03/21/2021 09:26:34 PM In the table, Project_Survey, fieldname 'X' has been renamed to 'longitude'
+03/21/2021 09:26:34 PM In the table, Project_Survey, fieldname 'Y' has been renamed to 'latitude'
+03/21/2021 09:26:34 PM Number of deleted records (test data): 8
+03/21/2021 09:26:34 PM 13 rows have been added to 'Project_Survey' table in the sqlite database.
+03/21/2021 09:26:34 PM 
+
+03/21/2021 09:26:34 PM --> Running shp2sqlite module
+03/21/2021 09:26:34 PM Running dict_lst_to_sqlite() to create a new table called projects_shp
+03/21/2021 09:26:34 PM 28 rows have been successfully transferred to projects_shp.
+03/21/2021 09:26:34 PM 
+
+03/21/2021 09:26:34 PM --> Running determine_project_id module
+03/21/2021 09:26:34 PM Opened C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP\script\Proj_shp\RAP_2020_Draft.shp
+03/21/2021 09:26:34 PM Adding geo check field
+03/21/2021 09:26:35 PM !!!! The following cluster surveys are not located within any project boundaries !!!!
+03/21/2021 09:26:35 PM !!!! Unique_id: 20, Cluster Num: 101, Lat Lon: 48.4970497340279, -81.3450264930725 !!!!
+03/21/2021 09:26:35 PM Populating (Updating) SQLite geo_check field with ProjectIDs
+03/21/2021 09:26:35 PM 
+
+03/21/2021 09:26:35 PM --> Running analysis module
+03/21/2021 09:26:35 PM Running Summarize_clusters method
+03/21/2021 09:26:35 PM Running dict_lst_to_sqlite() to create a new table called Cluster_Summary
+03/21/2021 09:26:35 PM 415 rows have been successfully transferred to Cluster_Summary.
+03/21/2021 09:26:35 PM Running summarize_projects method
+03/21/2021 09:26:35 PM !!!! multiple matching project survey records for ProjectID = b3 !!!!
+03/21/2021 09:26:35 PM !!!! multiple matching project survey records for ProjectID = Michaud132 !!!!
+03/21/2021 09:26:35 PM Running dict_lst_to_sqlite() to create a new table called Project_Summary
+03/21/2021 09:26:35 PM 28 rows have been successfully transferred to Project_Summary.
+03/21/2021 09:26:35 PM Running dict_lst_to_sqlite() to create a new table called Plot_Summary
+03/21/2021 09:26:37 PM 3320 rows have been successfully transferred to Plot_Summary.
+03/21/2021 09:26:37 PM Running dict_lst_to_sqlite() to create a new table called z_PBLK01
+03/21/2021 09:26:37 PM 47 rows have been successfully transferred to z_PBLK01.
+03/21/2021 09:26:37 PM Running dict_lst_to_sqlite() to create a new table called z_b3
+03/21/2021 09:26:37 PM 28 rows have been successfully transferred to z_b3.
+03/21/2021 09:26:37 PM Running dict_lst_to_sqlite() to create a new table called z_b6
+03/21/2021 09:26:37 PM 30 rows have been successfully transferred to z_b6.
+03/21/2021 09:26:37 PM Running dict_lst_to_sqlite() to create a new table called z_b4
+03/21/2021 09:26:37 PM 30 rows have been successfully transferred to z_b4.
+03/21/2021 09:26:37 PM Running dict_lst_to_sqlite() to create a new table called z_c3
+03/21/2021 09:26:37 PM 30 rows have been successfully transferred to z_c3.
+03/21/2021 09:26:38 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud132
+03/21/2021 09:26:38 PM 125 rows have been successfully transferred to z_Michaud132.
+03/21/2021 09:26:38 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud131
+03/21/2021 09:26:38 PM 29 rows have been successfully transferred to z_Michaud131.
+03/21/2021 09:26:38 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud130
+03/21/2021 09:26:38 PM 95 rows have been successfully transferred to z_Michaud130.
+03/21/2021 09:26:38 PM 
+
+03/21/2021 09:26:38 PM --> Running To_csv module
+03/21/2021 09:26:38 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+03/21/2021 09:26:38 PM Running plot_to_csv method
+03/21/2021 09:26:38 PM Running clus_to_csv
+03/21/2021 09:26:38 PM 
+
+03/21/2021 09:26:38 PM --> Running to_browsers module
+03/21/2021 09:26:38 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+03/21/2021 09:26:39 PM SEM program completed
+
+
+
+05/05/2021 08:01:10 PM ### ## #  Launching SEM program  # ## ###
+05/05/2021 08:01:10 PM Time: May 05, 2021. 08:01 PM
+05/05/2021 08:01:10 PM version 0.1
+05/05/2021 08:01:10 PM Stand-alone SEM.py run - TDT tool did not run!
+05/05/2021 08:01:10 PM Config file used: SEM.cfg
+05/05/2021 08:01:10 PM Survey Data being used: C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP_rawdata\NER-RAP_28-Jan-21_10-48\data
+05/05/2021 08:01:10 PM All variables from the config file:
+{'CALC': {'default_plot_area': '8',
+          'max_height': '40',
+          'max_num_of_t_per_plot': '6',
+          'min_height': '0.5',
+          'num_of_plots': '8',
+          'num_of_trees_4_spcomp': '2'},
+ 'CSV': {'csvfolderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                          'Ontario\\2021\\RAP_rawdata\\NER-RAP_28-Jan-21_10-48\\data',
+         'dbfolderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                         'Ontario\\2021\\RAP_Outputs\\2021_01\\sqlite',
+         'output_csv_folderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                                  'Ontario\\2021\\RAP_Outputs\\2021_01\\csv'},
+ 'LOG': {'debug': 'False'},
+ 'PDF': {'ref_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                       'Ontario\\2021\\RAP\\script\\pdf_to_post\\ref',
+         'report_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                          'Ontario\\2021\\RAP\\script\\pdf_to_post\\reports'},
+ 'SHP': {'area_ha_fieldname': 'Area_ha',
+         'dist_fieldname': 'District',
+         'fmu_fieldname': 'FMU',
+         'num_clus_fieldname': 'NumCluster',
+         'plot_size_fieldname': 'PlotSize_m',
+         'project_id_fieldname': 'ProjectID',
+         'project_shpfile': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                            'Ontario\\2021\\RAP\\script\\Proj_shp\\RAP_2020_Draft.shp',
+         'shp2sqlite_tablename': 'projects_shp'},
+ 'SPC': {'csv': 'SpeciesGroup.csv'},
+ 'SQLITE': {'clus_summary_tblname': 'Cluster_Summary',
+            'fin_proj_id': 'fin_proj_id',
+            'geo_check_fieldname': 'geo_proj_id',
+            'plot_summary_tblname': 'Plot_Summary',
+            'proj_id_override': 'ProjIDManualOverride',
+            'proj_summary_tblname': 'Project_Summary',
+            'unique_id_fieldname': 'unique_id'},
+ 'html': {'output_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                           'Ontario\\2021\\RAP_Outputs\\2021_01\\browser'}}
+05/05/2021 08:01:10 PM spc_to_check = ['AB', 'AW', 'BD', 'BE', 'BF', 'BN', 'BW', 'BY', 'CB', 'CE', 'CW', 'EW', 'EX', 'HE', 'HI', 'IW', 'LA', 'MH', 'MR', 'MS', 'OB', 'OR', 'OW', 'OX', 'PB', 'PJ', 'PL', 'PO', 'PR', 'PS', 'PT', 'PW', 'SB', 'SN', 'SR', 'SW', 'SX']
+05/05/2021 08:01:10 PM spc_group_dict = {'AX': ['AB', 'AW'], 'BD': ['BD'], 'BE': ['BE'], 'BF': ['BF'], 'BN': ['BN'], 'BW': ['BW'], 'BY': ['BY'], 'CB': ['CB'], 'CE': ['CE', 'CW'], 'EX': ['EW', 'EX'], 'HE': ['HE'], 'HI': ['HI'], 'IW': ['IW'], 'LA': ['LA'], 'MH': ['MH'], 'MR': ['MR'], 'MS': ['MS'], 'OX': ['OB', 'OR', 'OW', 'OX'], 'PO': ['PB', 'PL', 'PO', 'PT'], 'PJ': ['PJ'], 'PX': ['PR', 'PS'], 'PW': ['PW'], 'SX': ['SB', 'SN', 'SR', 'SW', 'SX']}
+05/05/2021 08:01:10 PM 
+
+05/05/2021 08:01:10 PM --> Running csv2sqlite module
+05/05/2021 08:01:10 PM working on 'Cluster_Survey'
+05/05/2021 08:01:10 PM Traceback (most recent call last):
+  File "C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP\script\SEM.py", line 60, in sem
+    c2s = csv2sqlite.Csv2sqlite(cfg_dict['CSV']['csvfolderpath'],cfg_dict['CSV']['dbfolderpath'],cfg_dict['SQLITE']['unique_id_fieldname'],logger, ignore_testdata)
+  File "C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP\script\modules\csv2sqlite.py", line 34, in __init__
+    self.csv_to_sqlite()
+  File "C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP\script\modules\csv2sqlite.py", line 100, in csv_to_sqlite
+    con = sqlite3.connect(self.db_fullpath_new)
+sqlite3.OperationalError: unable to open database file
+
+05/05/2021 08:05:40 PM ### ## #  Launching SEM program  # ## ###
+05/05/2021 08:05:40 PM Time: May 05, 2021. 08:05 PM
+05/05/2021 08:05:40 PM version 0.1
+05/05/2021 08:05:40 PM Stand-alone SEM.py run - TDT tool did not run!
+05/05/2021 08:05:40 PM Config file used: SEM.cfg
+05/05/2021 08:05:40 PM Survey Data being used: C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP_rawdata\NER-RAP_28-Jan-21_10-48\data
+05/05/2021 08:05:40 PM All variables from the config file:
+{'CALC': {'default_plot_area': '8',
+          'max_height': '40',
+          'max_num_of_t_per_plot': '6',
+          'min_height': '0.5',
+          'num_of_plots': '8',
+          'num_of_trees_4_spcomp': '2'},
+ 'CSV': {'csvfolderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                          'Ontario\\2021\\RAP_rawdata\\NER-RAP_28-Jan-21_10-48\\data',
+         'dbfolderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                         'Ontario\\2021\\RAP_Outputs\\2021_01\\sqlite',
+         'output_csv_folderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                                  'Ontario\\2021\\RAP_Outputs\\2021_01\\csv'},
+ 'LOG': {'debug': 'False'},
+ 'PDF': {'ref_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                       'Ontario\\2021\\RAP\\script\\pdf_to_post\\ref',
+         'report_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                          'Ontario\\2021\\RAP\\script\\pdf_to_post\\reports'},
+ 'SHP': {'area_ha_fieldname': 'Area_ha',
+         'dist_fieldname': 'District',
+         'fmu_fieldname': 'FMU',
+         'num_clus_fieldname': 'NumCluster',
+         'plot_size_fieldname': 'PlotSize_m',
+         'project_id_fieldname': 'ProjectID',
+         'project_shpfile': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                            'Ontario\\2021\\RAP\\script\\Proj_shp\\RAP_2020_Draft.shp',
+         'shp2sqlite_tablename': 'projects_shp'},
+ 'SPC': {'csv': 'SpeciesGroup.csv'},
+ 'SQLITE': {'clus_summary_tblname': 'Cluster_Summary',
+            'fin_proj_id': 'fin_proj_id',
+            'geo_check_fieldname': 'geo_proj_id',
+            'plot_summary_tblname': 'Plot_Summary',
+            'proj_id_override': 'ProjIDManualOverride',
+            'proj_summary_tblname': 'Project_Summary',
+            'unique_id_fieldname': 'unique_id'},
+ 'html': {'output_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                           'Ontario\\2021\\RAP_Outputs\\2021_01\\browser'}}
+05/05/2021 08:05:40 PM spc_to_check = ['AB', 'AW', 'BD', 'BE', 'BF', 'BN', 'BW', 'BY', 'CB', 'CE', 'CW', 'EW', 'EX', 'HE', 'HI', 'IW', 'LA', 'MH', 'MR', 'MS', 'OB', 'OR', 'OW', 'OX', 'PB', 'PJ', 'PL', 'PO', 'PR', 'PS', 'PT', 'PW', 'SB', 'SN', 'SR', 'SW', 'SX']
+05/05/2021 08:05:40 PM spc_group_dict = {'AX': ['AB', 'AW'], 'BD': ['BD'], 'BE': ['BE'], 'BF': ['BF'], 'BN': ['BN'], 'BW': ['BW'], 'BY': ['BY'], 'CB': ['CB'], 'CE': ['CE', 'CW'], 'EX': ['EW', 'EX'], 'HE': ['HE'], 'HI': ['HI'], 'IW': ['IW'], 'LA': ['LA'], 'MH': ['MH'], 'MR': ['MR'], 'MS': ['MS'], 'OX': ['OB', 'OR', 'OW', 'OX'], 'PO': ['PB', 'PL', 'PO', 'PT'], 'PJ': ['PJ'], 'PX': ['PR', 'PS'], 'PW': ['PW'], 'SX': ['SB', 'SN', 'SR', 'SW', 'SX']}
+05/05/2021 08:05:40 PM 
+
+05/05/2021 08:05:40 PM --> Running csv2sqlite module
+05/05/2021 08:05:40 PM working on 'Cluster_Survey'
+05/05/2021 08:05:40 PM * WARNING: Cluster_Survey does not have latitude or longitude field.
+05/05/2021 08:05:40 PM In the table, Cluster_Survey, fieldname 'X' has been renamed to 'longitude'
+05/05/2021 08:05:40 PM In the table, Cluster_Survey, fieldname 'Y' has been renamed to 'latitude'
+05/05/2021 08:05:40 PM Number of deleted records (test data): 34
+05/05/2021 08:05:40 PM 415 rows have been added to 'Cluster_Survey' table in the sqlite database.
+05/05/2021 08:05:40 PM working on 'Project_Survey'
+05/05/2021 08:05:40 PM * WARNING: Project_Survey does not have latitude or longitude field.
+05/05/2021 08:05:40 PM In the table, Project_Survey, fieldname 'X' has been renamed to 'longitude'
+05/05/2021 08:05:40 PM In the table, Project_Survey, fieldname 'Y' has been renamed to 'latitude'
+05/05/2021 08:05:40 PM Number of deleted records (test data): 8
+05/05/2021 08:05:40 PM 13 rows have been added to 'Project_Survey' table in the sqlite database.
+05/05/2021 08:05:40 PM 
+
+05/05/2021 08:05:40 PM --> Running shp2sqlite module
+05/05/2021 08:05:40 PM Running dict_lst_to_sqlite() to create a new table called projects_shp
+05/05/2021 08:05:40 PM 28 rows have been successfully transferred to projects_shp.
+05/05/2021 08:05:40 PM 
+
+05/05/2021 08:05:40 PM --> Running determine_project_id module
+05/05/2021 08:05:40 PM Opened C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP\script\Proj_shp\RAP_2020_Draft.shp
+05/05/2021 08:05:40 PM Adding geo check field
+05/05/2021 08:05:41 PM !!!! The following cluster surveys are not located within any project boundaries !!!!
+05/05/2021 08:05:41 PM !!!! Unique_id: 20, Cluster Num: 101, Lat Lon: 48.4970497340279, -81.3450264930725 !!!!
+05/05/2021 08:05:41 PM Populating (Updating) SQLite geo_check field with ProjectIDs
+05/05/2021 08:05:41 PM 
+
+05/05/2021 08:05:41 PM --> Running analysis module
+05/05/2021 08:05:41 PM Running Summarize_clusters method
+05/05/2021 08:05:41 PM Running dict_lst_to_sqlite() to create a new table called Cluster_Summary
+05/05/2021 08:05:41 PM 415 rows have been successfully transferred to Cluster_Summary.
+05/05/2021 08:05:41 PM Running summarize_projects method
+05/05/2021 08:05:41 PM !!!! multiple matching project survey records for ProjectID = b3 !!!!
+05/05/2021 08:05:41 PM !!!! multiple matching project survey records for ProjectID = Michaud132 !!!!
+05/05/2021 08:05:41 PM Running dict_lst_to_sqlite() to create a new table called Project_Summary
+05/05/2021 08:05:41 PM 28 rows have been successfully transferred to Project_Summary.
+05/05/2021 08:05:41 PM Running dict_lst_to_sqlite() to create a new table called Plot_Summary
+05/05/2021 08:05:43 PM 3320 rows have been successfully transferred to Plot_Summary.
+05/05/2021 08:05:43 PM Running dict_lst_to_sqlite() to create a new table called z_PBLK01
+05/05/2021 08:05:44 PM 47 rows have been successfully transferred to z_PBLK01.
+05/05/2021 08:05:44 PM Running dict_lst_to_sqlite() to create a new table called z_b3
+05/05/2021 08:05:44 PM 28 rows have been successfully transferred to z_b3.
+05/05/2021 08:05:44 PM Running dict_lst_to_sqlite() to create a new table called z_b6
+05/05/2021 08:05:44 PM 30 rows have been successfully transferred to z_b6.
+05/05/2021 08:05:44 PM Running dict_lst_to_sqlite() to create a new table called z_b4
+05/05/2021 08:05:44 PM 30 rows have been successfully transferred to z_b4.
+05/05/2021 08:05:44 PM Running dict_lst_to_sqlite() to create a new table called z_c3
+05/05/2021 08:05:44 PM 30 rows have been successfully transferred to z_c3.
+05/05/2021 08:05:44 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud132
+05/05/2021 08:05:44 PM 125 rows have been successfully transferred to z_Michaud132.
+05/05/2021 08:05:44 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud131
+05/05/2021 08:05:44 PM 29 rows have been successfully transferred to z_Michaud131.
+05/05/2021 08:05:44 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud130
+05/05/2021 08:05:44 PM 95 rows have been successfully transferred to z_Michaud130.
+05/05/2021 08:05:44 PM 
+
+05/05/2021 08:05:44 PM --> Running To_csv module
+05/05/2021 08:05:44 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+05/05/2021 08:05:44 PM Running plot_to_csv method
+05/05/2021 08:05:44 PM Running clus_to_csv
+05/05/2021 08:05:44 PM 
+
+05/05/2021 08:05:44 PM --> Running to_browsers module
+05/05/2021 08:05:44 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+05/05/2021 08:05:45 PM SEM program completed
+
+
+
+05/05/2021 08:15:14 PM ### ## #  Launching SEM program  # ## ###
+05/05/2021 08:15:14 PM Time: May 05, 2021. 08:15 PM
+05/05/2021 08:15:14 PM version 0.1
+05/05/2021 08:15:14 PM Stand-alone SEM.py run - TDT tool did not run!
+05/05/2021 08:15:14 PM Config file used: SEM.cfg
+05/05/2021 08:15:14 PM Survey Data being used: C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP_rawdata\NER-RAP_28-Jan-21_10-48\data
+05/05/2021 08:15:14 PM All variables from the config file:
+{'CALC': {'default_plot_area': '8',
+          'max_height': '40',
+          'max_num_of_t_per_plot': '6',
+          'min_height': '0.5',
+          'num_of_plots': '8',
+          'num_of_trees_4_spcomp': '2'},
+ 'CSV': {'csvfolderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                          'Ontario\\2021\\RAP_rawdata\\NER-RAP_28-Jan-21_10-48\\data',
+         'dbfolderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                         'Ontario\\2021\\RAP_Outputs\\2021_01\\sqlite',
+         'output_csv_folderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                                  'Ontario\\2021\\RAP_Outputs\\2021_01\\csv'},
+ 'LOG': {'debug': 'False'},
+ 'PDF': {'ref_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                       'Ontario\\2021\\RAP\\script\\pdf_to_post\\ref',
+         'report_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                          'Ontario\\2021\\RAP\\script\\pdf_to_post\\reports'},
+ 'SHP': {'area_ha_fieldname': 'Area_ha',
+         'dist_fieldname': 'District',
+         'fmu_fieldname': 'FMU',
+         'num_clus_fieldname': 'NumCluster',
+         'plot_size_fieldname': 'PlotSize_m',
+         'project_id_fieldname': 'ProjectID',
+         'project_shpfile': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                            'Ontario\\2021\\RAP\\script\\Proj_shp\\RAP_2020_Final.shp',
+         'shp2sqlite_tablename': 'projects_shp'},
+ 'SPC': {'csv': 'SpeciesGroup.csv'},
+ 'SQLITE': {'clus_summary_tblname': 'Cluster_Summary',
+            'fin_proj_id': 'fin_proj_id',
+            'geo_check_fieldname': 'geo_proj_id',
+            'plot_summary_tblname': 'Plot_Summary',
+            'proj_id_override': 'ProjIDManualOverride',
+            'proj_summary_tblname': 'Project_Summary',
+            'unique_id_fieldname': 'unique_id'},
+ 'html': {'output_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                           'Ontario\\2021\\RAP_Outputs\\2021_01\\browser'}}
+05/05/2021 08:15:14 PM spc_to_check = ['AB', 'AW', 'BD', 'BE', 'BF', 'BN', 'BW', 'BY', 'CB', 'CE', 'CW', 'EW', 'EX', 'HE', 'HI', 'IW', 'LA', 'MH', 'MR', 'MS', 'OB', 'OR', 'OW', 'OX', 'PB', 'PJ', 'PL', 'PO', 'PR', 'PS', 'PT', 'PW', 'SB', 'SN', 'SR', 'SW', 'SX']
+05/05/2021 08:15:14 PM spc_group_dict = {'AX': ['AB', 'AW'], 'BD': ['BD'], 'BE': ['BE'], 'BF': ['BF'], 'BN': ['BN'], 'BW': ['BW'], 'BY': ['BY'], 'CB': ['CB'], 'CE': ['CE', 'CW'], 'EX': ['EW', 'EX'], 'HE': ['HE'], 'HI': ['HI'], 'IW': ['IW'], 'LA': ['LA'], 'MH': ['MH'], 'MR': ['MR'], 'MS': ['MS'], 'OX': ['OB', 'OR', 'OW', 'OX'], 'PO': ['PB', 'PL', 'PO', 'PT'], 'PJ': ['PJ'], 'PX': ['PR', 'PS'], 'PW': ['PW'], 'SX': ['SB', 'SN', 'SR', 'SW', 'SX']}
+05/05/2021 08:15:14 PM 
+
+05/05/2021 08:15:14 PM --> Running csv2sqlite module
+05/05/2021 08:15:14 PM working on 'Cluster_Survey'
+05/05/2021 08:15:14 PM * WARNING: Cluster_Survey does not have latitude or longitude field.
+05/05/2021 08:15:14 PM In the table, Cluster_Survey, fieldname 'X' has been renamed to 'longitude'
+05/05/2021 08:15:14 PM In the table, Cluster_Survey, fieldname 'Y' has been renamed to 'latitude'
+05/05/2021 08:15:14 PM Number of deleted records (test data): 34
+05/05/2021 08:15:14 PM 415 rows have been added to 'Cluster_Survey' table in the sqlite database.
+05/05/2021 08:15:14 PM working on 'Project_Survey'
+05/05/2021 08:15:14 PM * WARNING: Project_Survey does not have latitude or longitude field.
+05/05/2021 08:15:14 PM In the table, Project_Survey, fieldname 'X' has been renamed to 'longitude'
+05/05/2021 08:15:14 PM In the table, Project_Survey, fieldname 'Y' has been renamed to 'latitude'
+05/05/2021 08:15:14 PM Number of deleted records (test data): 8
+05/05/2021 08:15:14 PM 13 rows have been added to 'Project_Survey' table in the sqlite database.
+05/05/2021 08:15:14 PM 
+
+05/05/2021 08:15:14 PM --> Running shp2sqlite module
+05/05/2021 08:15:15 PM Running dict_lst_to_sqlite() to create a new table called projects_shp
+05/05/2021 08:15:15 PM 8 rows have been successfully transferred to projects_shp.
+05/05/2021 08:15:15 PM 
+
+05/05/2021 08:15:15 PM --> Running determine_project_id module
+05/05/2021 08:15:15 PM Opened C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP\script\Proj_shp\RAP_2020_Final.shp
+05/05/2021 08:15:15 PM Adding geo check field
+05/05/2021 08:15:15 PM !!!! The following cluster surveys are not located within any project boundaries !!!!
+05/05/2021 08:15:15 PM !!!! Unique_id: 20, Cluster Num: 101, Lat Lon: 48.4970497340279, -81.3450264930725 !!!!
+05/05/2021 08:15:15 PM Populating (Updating) SQLite geo_check field with ProjectIDs
+05/05/2021 08:15:15 PM 
+
+05/05/2021 08:15:15 PM --> Running analysis module
+05/05/2021 08:15:16 PM Running Summarize_clusters method
+05/05/2021 08:15:16 PM Running dict_lst_to_sqlite() to create a new table called Cluster_Summary
+05/05/2021 08:15:16 PM 415 rows have been successfully transferred to Cluster_Summary.
+05/05/2021 08:15:16 PM Running summarize_projects method
+05/05/2021 08:15:16 PM !!!! multiple matching project survey records for ProjectID = b3 !!!!
+05/05/2021 08:15:16 PM !!!! multiple matching project survey records for ProjectID = Michaud132 !!!!
+05/05/2021 08:15:16 PM Running dict_lst_to_sqlite() to create a new table called Project_Summary
+05/05/2021 08:15:16 PM 8 rows have been successfully transferred to Project_Summary.
+05/05/2021 08:15:16 PM Running dict_lst_to_sqlite() to create a new table called Plot_Summary
+05/05/2021 08:15:21 PM 3320 rows have been successfully transferred to Plot_Summary.
+05/05/2021 08:15:21 PM Running dict_lst_to_sqlite() to create a new table called z_PBLK01
+05/05/2021 08:15:21 PM 47 rows have been successfully transferred to z_PBLK01.
+05/05/2021 08:15:21 PM Running dict_lst_to_sqlite() to create a new table called z_b3
+05/05/2021 08:15:21 PM 28 rows have been successfully transferred to z_b3.
+05/05/2021 08:15:21 PM Running dict_lst_to_sqlite() to create a new table called z_b6
+05/05/2021 08:15:21 PM 30 rows have been successfully transferred to z_b6.
+05/05/2021 08:15:21 PM Running dict_lst_to_sqlite() to create a new table called z_b4
+05/05/2021 08:15:21 PM 30 rows have been successfully transferred to z_b4.
+05/05/2021 08:15:21 PM Running dict_lst_to_sqlite() to create a new table called z_c3
+05/05/2021 08:15:21 PM 30 rows have been successfully transferred to z_c3.
+05/05/2021 08:15:21 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud132
+05/05/2021 08:15:22 PM 125 rows have been successfully transferred to z_Michaud132.
+05/05/2021 08:15:22 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud131
+05/05/2021 08:15:22 PM 29 rows have been successfully transferred to z_Michaud131.
+05/05/2021 08:15:22 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud130
+05/05/2021 08:15:22 PM 95 rows have been successfully transferred to z_Michaud130.
+05/05/2021 08:15:22 PM 
+
+05/05/2021 08:15:22 PM --> Running To_csv module
+05/05/2021 08:15:22 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+05/05/2021 08:15:22 PM Running plot_to_csv method
+05/05/2021 08:15:22 PM Running clus_to_csv
+05/05/2021 08:15:22 PM 
+
+05/05/2021 08:15:22 PM --> Running to_browsers module
+05/05/2021 08:15:23 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+05/05/2021 08:15:23 PM SEM program completed
+
+
+
+05/05/2021 08:17:23 PM ### ## #  Launching SEM program  # ## ###
+05/05/2021 08:17:23 PM Time: May 05, 2021. 08:17 PM
+05/05/2021 08:17:23 PM version 0.1
+05/05/2021 08:17:23 PM Stand-alone SEM.py run - TDT tool did not run!
+05/05/2021 08:17:23 PM Config file used: SEM.cfg
+05/05/2021 08:17:23 PM Survey Data being used: C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP_rawdata\NER-RAP_28-Jan-21_10-48\data
+05/05/2021 08:17:23 PM All variables from the config file:
+{'CALC': {'default_plot_area': '8',
+          'max_height': '40',
+          'max_num_of_t_per_plot': '6',
+          'min_height': '0.5',
+          'num_of_plots': '8',
+          'num_of_trees_4_spcomp': '2'},
+ 'CSV': {'csvfolderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                          'Ontario\\2021\\RAP_rawdata\\NER-RAP_28-Jan-21_10-48\\data',
+         'dbfolderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                         'Ontario\\2021\\RAP_Outputs\\2021_01\\sqlite',
+         'output_csv_folderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                                  'Ontario\\2021\\RAP_Outputs\\2021_01\\csv'},
+ 'LOG': {'debug': 'False'},
+ 'PDF': {'ref_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                       'Ontario\\2021\\RAP\\script\\pdf_to_post\\ref',
+         'report_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                          'Ontario\\2021\\RAP\\script\\pdf_to_post\\reports'},
+ 'SHP': {'area_ha_fieldname': 'Area_ha',
+         'dist_fieldname': 'District',
+         'fmu_fieldname': 'FMU',
+         'num_clus_fieldname': 'NumCluster',
+         'plot_size_fieldname': 'PlotSize_m',
+         'project_id_fieldname': 'ProjectID',
+         'project_shpfile': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                            'Ontario\\2021\\RAP\\script\\Proj_shp\\RAP_2020_Final.shp',
+         'shp2sqlite_tablename': 'projects_shp'},
+ 'SPC': {'csv': 'SpeciesGroup.csv'},
+ 'SQLITE': {'clus_summary_tblname': 'Cluster_Summary',
+            'fin_proj_id': 'fin_proj_id',
+            'geo_check_fieldname': 'geo_proj_id',
+            'plot_summary_tblname': 'Plot_Summary',
+            'proj_id_override': 'ProjIDManualOverride',
+            'proj_summary_tblname': 'Project_Summary',
+            'unique_id_fieldname': 'unique_id'},
+ 'html': {'output_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                           'Ontario\\2021\\RAP_Outputs\\2021_01\\browser'}}
+05/05/2021 08:17:23 PM spc_to_check = ['AB', 'AW', 'BD', 'BE', 'BF', 'BN', 'BW', 'BY', 'CB', 'CE', 'CW', 'EW', 'EX', 'HE', 'HI', 'IW', 'LA', 'MH', 'MR', 'MS', 'OB', 'OR', 'OW', 'OX', 'PB', 'PJ', 'PL', 'PO', 'PR', 'PS', 'PT', 'PW', 'SB', 'SN', 'SR', 'SW', 'SX']
+05/05/2021 08:17:23 PM spc_group_dict = {'AX': ['AB', 'AW'], 'BD': ['BD'], 'BE': ['BE'], 'BF': ['BF'], 'BN': ['BN'], 'BW': ['BW'], 'BY': ['BY'], 'CB': ['CB'], 'CE': ['CE', 'CW'], 'EX': ['EW', 'EX'], 'HE': ['HE'], 'HI': ['HI'], 'IW': ['IW'], 'LA': ['LA'], 'MH': ['MH'], 'MR': ['MR'], 'MS': ['MS'], 'OX': ['OB', 'OR', 'OW', 'OX'], 'PO': ['PB', 'PL', 'PO', 'PT'], 'PJ': ['PJ'], 'PX': ['PR', 'PS'], 'PW': ['PW'], 'SX': ['SB', 'SN', 'SR', 'SW', 'SX']}
+05/05/2021 08:17:23 PM 
+
+05/05/2021 08:17:23 PM --> Running csv2sqlite module
+05/05/2021 08:17:23 PM working on 'Cluster_Survey'
+05/05/2021 08:17:23 PM * WARNING: Cluster_Survey does not have latitude or longitude field.
+05/05/2021 08:17:23 PM In the table, Cluster_Survey, fieldname 'X' has been renamed to 'longitude'
+05/05/2021 08:17:23 PM In the table, Cluster_Survey, fieldname 'Y' has been renamed to 'latitude'
+05/05/2021 08:17:23 PM Number of deleted records (test data): 34
+05/05/2021 08:17:23 PM 415 rows have been added to 'Cluster_Survey' table in the sqlite database.
+05/05/2021 08:17:23 PM working on 'Project_Survey'
+05/05/2021 08:17:23 PM * WARNING: Project_Survey does not have latitude or longitude field.
+05/05/2021 08:17:23 PM In the table, Project_Survey, fieldname 'X' has been renamed to 'longitude'
+05/05/2021 08:17:23 PM In the table, Project_Survey, fieldname 'Y' has been renamed to 'latitude'
+05/05/2021 08:17:23 PM Number of deleted records (test data): 8
+05/05/2021 08:17:23 PM 13 rows have been added to 'Project_Survey' table in the sqlite database.
+05/05/2021 08:17:23 PM 
+
+05/05/2021 08:17:23 PM --> Running shp2sqlite module
+05/05/2021 08:17:23 PM Running dict_lst_to_sqlite() to create a new table called projects_shp
+05/05/2021 08:17:23 PM 8 rows have been successfully transferred to projects_shp.
+05/05/2021 08:17:23 PM 
+
+05/05/2021 08:17:23 PM --> Running determine_project_id module
+05/05/2021 08:17:23 PM Opened C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP\script\Proj_shp\RAP_2020_Final.shp
+05/05/2021 08:17:23 PM Adding geo check field
+05/05/2021 08:17:24 PM !!!! The following cluster surveys are not located within any project boundaries !!!!
+05/05/2021 08:17:24 PM !!!! Unique_id: 20, Cluster Num: 101, Lat Lon: 48.4970497340279, -81.3450264930725 !!!!
+05/05/2021 08:17:24 PM Populating (Updating) SQLite geo_check field with ProjectIDs
+05/05/2021 08:17:24 PM 
+
+05/05/2021 08:17:24 PM --> Running analysis module
+05/05/2021 08:17:24 PM Running Summarize_clusters method
+05/05/2021 08:17:24 PM Running dict_lst_to_sqlite() to create a new table called Cluster_Summary
+05/05/2021 08:17:24 PM 415 rows have been successfully transferred to Cluster_Summary.
+05/05/2021 08:17:24 PM Running summarize_projects method
+05/05/2021 08:17:24 PM !!!! multiple matching project survey records for ProjectID = b3 !!!!
+05/05/2021 08:17:24 PM !!!! multiple matching project survey records for ProjectID = Michaud132 !!!!
+05/05/2021 08:17:24 PM Running dict_lst_to_sqlite() to create a new table called Project_Summary
+05/05/2021 08:17:24 PM 8 rows have been successfully transferred to Project_Summary.
+05/05/2021 08:17:24 PM Running dict_lst_to_sqlite() to create a new table called Plot_Summary
+05/05/2021 08:17:26 PM 3320 rows have been successfully transferred to Plot_Summary.
+05/05/2021 08:17:26 PM Running dict_lst_to_sqlite() to create a new table called z_PBLK01
+05/05/2021 08:17:26 PM 47 rows have been successfully transferred to z_PBLK01.
+05/05/2021 08:17:26 PM Running dict_lst_to_sqlite() to create a new table called z_b3
+05/05/2021 08:17:26 PM 28 rows have been successfully transferred to z_b3.
+05/05/2021 08:17:26 PM Running dict_lst_to_sqlite() to create a new table called z_b6
+05/05/2021 08:17:26 PM 30 rows have been successfully transferred to z_b6.
+05/05/2021 08:17:26 PM Running dict_lst_to_sqlite() to create a new table called z_b4
+05/05/2021 08:17:26 PM 30 rows have been successfully transferred to z_b4.
+05/05/2021 08:17:26 PM Running dict_lst_to_sqlite() to create a new table called z_c3
+05/05/2021 08:17:26 PM 30 rows have been successfully transferred to z_c3.
+05/05/2021 08:17:27 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud132
+05/05/2021 08:17:27 PM 125 rows have been successfully transferred to z_Michaud132.
+05/05/2021 08:17:27 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud131
+05/05/2021 08:17:27 PM 29 rows have been successfully transferred to z_Michaud131.
+05/05/2021 08:17:27 PM Running dict_lst_to_sqlite() to create a new table called z_Michaud130
+05/05/2021 08:17:27 PM 95 rows have been successfully transferred to z_Michaud130.
+05/05/2021 08:17:27 PM 
+
+05/05/2021 08:17:27 PM --> Running To_csv module
+05/05/2021 08:17:27 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+05/05/2021 08:17:27 PM Running plot_to_csv method
+05/05/2021 08:17:27 PM Running clus_to_csv
+05/05/2021 08:17:27 PM 
+
+05/05/2021 08:17:27 PM --> Running to_browsers module
+05/05/2021 08:17:27 PM Active Projects: ['PBLK01', 'b3', 'b6', 'b4', 'c3', 'Michaud132', 'Michaud131', 'Michaud130']
+05/05/2021 08:17:28 PM SEM program completed
+
+
+

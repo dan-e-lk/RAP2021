@@ -1,0 +1,13 @@
+Before going out to the field.
+1. check the battery level of your tablet
+2. make sure you have Terraflex app and make sure you can log in.
+3. on your Terraflex app, make sure you can open RAP project.
+4. prepare a map + GPS or a geoPDF map pinpointing where each of the clusters are located.
+
+
+When you are in the field.
+1. Make sure your GPS is on.
+2. When you arrive at the project location, open Terraflex - RAP project and fill out the project survey form.
+
+
+

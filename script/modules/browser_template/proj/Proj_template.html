@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>$$ProjectID%%</title>
+
+	<!-- jQuery -->
+	<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+
+    <!-- datatables library (CDN) -->
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+
+	<script type="text/javascript" language="javascript" class="init">
+		$(document).ready(function() {
+		    $('table.display').DataTable();
+		});
+	</script>
+
+
+	<!-- Leaflet (CDN) -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+	integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+	crossorigin=""/>
+	<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+	integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+	crossorigin=""></script>
+
+
+	<!-- local css -->
+	<link rel="stylesheet" type="text/css" href="Proj.css">
+
+</head>
+<body>
+	<h1>Project ID:  $$ProjectID%% <small>($$Progress%%)</small></h1>
+
+	<div id = "stripe">
+		<button class="menu selected" id="proj_map">Map</button>
+		<button class="menu" id="summary">Summary</button>
+		<button class="menu" id="processed_data">Processed Data</button>
+		<button class="menu" id="raw_data">Raw Data</button>
+		<button class="menu" id="pictures">Photos</button>			
+	</div>
+
+
+
+<div class = "proj_map tab">
+	<div id="mapid"></div>	
+	Last Updated: $$time_now%%<br>
+</div>
+
+
+<div class = "summary tab" style="display: none;">
+	$$Summary%%
+</div>
+
+
+<div class = "processed_data tab" style="display: none;">
+	$$ProcessedData%%
+</div>
+
+
+<div class = "raw_data tab" style="display: none;">
+	$$RawData%%
+</div>
+
+<div class = "pictures tab" style="display: none;">
+	$$Pictures%%
+</div>
+
+
+	<script type="text/javascript">
+		var mymap = L.map('mapid', {scrollWheelZoom: false}).setView([48.8888, -83.3333], 16);
+	</script>
+
+	<script type="text/javascript" src="Proj.js"></script>
+
+</body>
+</html>

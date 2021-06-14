@@ -1,0 +1,28 @@
+Currently using WinPython-64-3.7.6.0.  This single package has all the python libraries you need to run all the scripts.
+
+If the surveyed cluster is located outside the project boundary
+	If this happens, the warning would show up on the log. (look for the "!!!!" sign)
+	Protram will still run, but that particular cluster will not be part of the analysis, and wouldn't show up on the browser map.
+	To resolve this, one would have to manually enter the project id (spelled exactly right) on the Cluster Survey form's Proj Id Manual Override section (under AutoGen section).
+
+If there's a duplicate cluster survey (same cluster id).
+
+If there's a duplicate project survey (same project id).
+
+If the TDT doesn't work.
+
+Shapefile: If shapefile didn't have mandatory fields such as lat, lon
+
+
+
+
+
+####### To DO  ##########
+
+Browsers:
+back button
+explain the acronyms
+Ontario Logo
+get real domain
+lat, lon - Lat, Long
+Use Summary page as the first page instead of map.

@@ -1,0 +1,44 @@
+about SpeciesGroup.csv table:
+Only those species that are listed in this table will be counted for any calculations done.
+For example if the field officer finds a cucumber tree, but if the cucumber tree is not listed in the SpeciesGroup.csv table, that tree won't be counted for effective density, species comp, etc. with one exception: the plot will still marked as occupied, so the cucumber tree will still impact the site occupancy.
+Ideally, this table should include all valid species codes
+
+
+
+
+Sb
+Sw
+Pj
+Pr
+Pw
+Bf
+Ce
+La
+Pt
+Pb
+Pl
+Bw
+Mr
+Mh
+By
+Ab
+Aw
+Or
+Bd
+Be
+Bn
+Cb
+Cw
+Ew
+EX
+He
+Hi
+Iw
+Ms
+Ob
+Ow
+PO
+Ps
+Sn
+Sr
+SX

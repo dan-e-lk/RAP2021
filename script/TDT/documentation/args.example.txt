@@ -1,0 +1,1 @@
+TDT.exe -u "username@ontario.ca" -p "MyAwesomePass" -j "NER_API8" -l "C:\Users\MasonS\Desktop" -t "FILEGDB" -d "All" -i "False" -x "False" -b "True" -g "True"

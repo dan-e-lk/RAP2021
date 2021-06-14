@@ -1,0 +1,139 @@
+#ChangeLog
+#
+# Version 1.113
+# Date: May 17, 2019
+#
+# Updated the append date to include front/back/none date strings
+# Updated the menu options to display insphere and connect API links
+# Minor improvements within TerraFlexAPI
+# Added api access path in the configuration
+# Added filename append date in the configuration
+# Added user email in the confiuration
+#
+# Version 1.112
+# Date: May 16, 2019
+#
+# Updated the configuration to include an addtional attribute for appending the date
+# Created a method to append/un-append date at end of a file save name
+# Fixed some issues with duplicate names
+#
+# Version 1.111
+# Date: May 15, 2019
+#
+# Fixed some bugs in the TerraFlexAPI module
+# Added additional fields to the user accounts
+# Created a local user account that can be pre-defined without Trimble accounts
+#
+# Version: 1.110
+# Date: May 12, 2019
+#
+# Fixed a bug with the bypass proxy not working. You MUST set proxy required to False
+# Created a process to restrict project access; user accounts are admin or user
+# admin: can delete, user cannot
+# Updated the duplicate name funciton to better integrate with underscore integers
+# Script mode now adheres to duplicate names, project list, and deletion list
+#
+# Version: 1.109
+# Date: May 07, 2019
+#
+# Fixed some minor issues with the timeout process
+# Fixed some issues with the deletion process not working
+# Fixed some issues with the proxy list being blank when loaded without username and password
+# Fixed some issues with the headers for the POST
+# Fixed an issue with the 'open download folder' opening the Documents folder
+#
+# Version: 1.108
+# Date: May 06, 2019
+#
+# Adjusted how the proxies are selected due to an issue with the proxy load balancer
+# The proxies will now attempt first, second, then random
+# Adjusted the timeout values for the get, head, post, and delete
+# Added a field to determine if the proxy configuration requires authentication in
+# the config file
+# Some minor bug fixes within TerraFlexAPI
+# Reconfigured the populateHash
+#
+# Version: 1.107
+# Date: May 02, 2019
+#
+# Updated the method for creating an export project as per changes via TerraFlex API
+#
+# Version: 1.106
+# Date: May 01, 2019
+#
+# Updated the version check to include a server check on RODOpen
+# Improved overall performance and cleaned up some older code
+# Fixed a glitch where the GUI was requesting a download every second instead
+# of using the requested wait time in seconds
+# Updated the Ontario logo to better reflect the provincal logo
+# Added a verification when there is 'NoData' in an export to stop the process
+#
+# Version: 1.105
+# Date: April 30, 2019
+#
+# Enabled a method to run the application behind the firewall
+# Created a 'delete' user list to prevent unauthorized feature deletions
+# Updated the .ini file to include more details for proxy access
+# Fixed some minor bugs in the code
+#
+# Version: 1.104
+# Date: April 29, 2019
+#
+# Created a 'DELETE ONLY' option
+# This allows the deletion of data without having to download it first
+# Fixed some minor bugs with the process hash module
+# Fixed some issues with error reporting and updated the results
+# Updated the deletions txt with additional error checks
+# Updated the python version
+# Addressed some minor inefficiencies in the code
+#
+# Version: 1.103
+# Date: April 17, 2019
+#
+# Fixed a bug with urlencode not working properly with Python 3
+# Fixed a bug in how the arguments are passed into the program
+# Adjusted the argument list to reflect the new user friendly names
+# Created a new feature to validate specific files and folders
+# Bug found in argument help; TDT.exe -h won't display help message due
+# to the --noconsole method used with pyinstaller
+# Updated the processHash tool
+#
+# Version: 1.102
+# Date: April 10, 2019
+#
+# Created a rudementary progress bar to illustrate the progress of the actions
+# This is currently in BETA testing... not the more reflective in terms of updates
+# Added the ability to enable/disable the debug mode via config file
+# Fixed a glitch with the deletion method
+# Added the ontario trillium logo
+# Made some tweaks to the code to ensure a more stable program
+# Many updates: GUI, TerraFlexAPI, 1138
+# Debug mode: False
+# Console mode: True
+#
+# Version: 1.101
+# Date: April 09, 2019
+#
+# Added some visual queues when the user is about to 'delete' data
+# Created a check to see if there is at least 1 or more features in a project
+# before attempting to create a zip file (exported project)
+# Added some try/except catches when looking up key pairs from the JSON
+# Adjusted some of the error codes returned to the GUI
+# Debug mode: False
+# Console mode: True
+#
+# Version: 1.100
+# Date: April 08, 2019
+#
+# Fixed some minor issues with the program timing out
+# Should ensure that the post has ample time to perform the POST request
+# Added a warning dialog message to user when attempting to delete data GUI
+# Debug mode: False
+# Console mode: True
+#
+# Version: 1.000
+# Date: March 01, 2019
+#
+# Initial program creation
+# Alpha phase
+#

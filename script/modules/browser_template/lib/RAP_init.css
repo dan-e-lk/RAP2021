@@ -1,0 +1,65 @@
+body {
+/*	background-color: #232323;*/
+	margin: 0;
+	font-family: "Century Gothic", "Montserrat", "Avenir";
+}
+
+h1 {
+	text-align: center;
+	line-height: 1.1;
+	font-weight: normal;
+	color: white;
+	background: steelblue;
+	margin: 0;
+	text-transform: uppercase;
+	padding: 20px 0;
+}
+
+#stripe {
+	background: rgb(204, 239, 255);
+	height: 30px;
+	text-align: center;
+	color: black;
+}
+
+button {
+	border: none;
+	background: none;
+	text-transform: uppercase;
+	height: 100%;
+	min-width: 100px;
+	font-weight: 700;
+	color: steelblue;
+	letter-spacing: 1px;
+	font-size: inherit;
+	transition: all 0.3s;
+	-webkit-transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	outline: none;
+}
+
+button:hover {
+	color: white;
+	background: steelblue;
+}
+
+.selected {
+	color: white;
+	background: steelblue;
+}
+
+.dashboard {
+	width: 80%;
+	margin: 40px auto;
+}
+
+.data, .doc {
+	width: 80%;
+	margin: 40px auto;
+}
+
+#mapid {
+	margin: 40px auto;
+	height: 500px;
+	width: 90%;
+}
