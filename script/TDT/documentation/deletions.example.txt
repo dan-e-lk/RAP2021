@@ -1,7 +1,0 @@
-Wed May  8 08:37:36 2019
-66715
-l329819_ab1,l329820_ab2,l334572_nt1
-Feature List: [['Point', 'l334572_nt1.7'], ['Point', 'l329820_ab2.36'], ['Point', 'l329819_ab1.41']]
-l334572_nt1.7: Deleted -> "OK"
-l329820_ab2.36: Deleted -> "OK"
-l329819_ab1.41: Deleted -> "OK"

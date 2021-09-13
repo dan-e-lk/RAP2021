@@ -8,7 +8,7 @@ print(sys.version)
 from modules import common_functions, csv2sqlite, determine_project_id, analysis, log, shp2sqlite, to_csv, to_browsers
 
 
-def sem(configfilepath, initial_msg, custom_datapath = None, ignore_testdata = True):
+def RAP(configfilepath, initial_msg, custom_datapath = None, ignore_testdata = False):
 	"""configfile carries most of the static variables. configfile is typically located in the same folder as this script: SEM.cfg
 	initial_msg is used when another program such as TDT is run before this script run. The message will be carried on to the log file.
 	custom_datapath is used when TDT did is run right before this tool. custom_datapath will replace config's CSV.folderpath variable.
@@ -16,7 +16,7 @@ def sem(configfilepath, initial_msg, custom_datapath = None, ignore_testdata = T
 	"""
 	timenow = common_functions.datetime_readable() #eg. Apr 21, 2020. 02:09 PM
 
-	# grab the config file
+	# grab the config file. this config file has most of the variables necessary to run this tool
 	config_file = configfilepath
 	cfg_dict = common_functions.cfg_to_dict(config_file)
 
@@ -26,11 +26,11 @@ def sem(configfilepath, initial_msg, custom_datapath = None, ignore_testdata = T
 			cfg_dict['CSV']['csvfolderpath'] = custom_datapath
 
 	# start logging
-	logfile = os.path.join(os.path.split(os.path.abspath(__file__))[0], 'log_sem.txt')
+	logfile = os.path.join(os.path.split(os.path.abspath(__file__))[0], 'log_rap.txt')
 	debug = True if cfg_dict['LOG']['debug'].upper() == 'TRUE' else False
 
 	logger = log.logger(logfile, debug)
-	logger.info('### ## #  Launching SEM program  # ## ###')
+	logger.info('### ## #  Launching RAP program  # ## ###')
 	logger.info('Time: %s'%timenow)
 	logger.info('version %s'%version)
 	logger.info(initial_msg)
@@ -41,12 +41,7 @@ def sem(configfilepath, initial_msg, custom_datapath = None, ignore_testdata = T
 
 	try:
 
-		## insert "check config file" module here ##
-		# check the path of every path variables in the config file
-
-
-		# Other things that needs checking:
-
+		## if have time, insert "check config file" module here to check the path of every path variables in the config file
 
 
 		## grabbing (and checking) spcies group from SpeciesGroup.csv
@@ -116,4 +111,4 @@ def sem(configfilepath, initial_msg, custom_datapath = None, ignore_testdata = T
 if __name__ == '__main__':
 	configfile = 'RAP.cfg'
 	initial_msg = "Stand-alone SEM.py run - TDT tool did not run!"
-	sem(configfile, initial_msg)
+	RAP(configfile, initial_msg)
