@@ -1,4 +1,4 @@
-version = '0.1'
+version = '2021.09'
 
 
 import sys, os, pprint, traceback
@@ -114,6 +114,6 @@ def sem(configfilepath, initial_msg, custom_datapath = None, ignore_testdata = T
 
 
 if __name__ == '__main__':
-	configfile = 'SEM.cfg'
+	configfile = 'RAP.cfg'
 	initial_msg = "Stand-alone SEM.py run - TDT tool did not run!"
 	sem(configfile, initial_msg)
