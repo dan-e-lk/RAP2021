@@ -1,0 +1,120 @@
+10/01/2021 08:52:46 PM 
+
+############## ## #  Launching RAP program  # ## ##################
+10/01/2021 08:52:46 PM Time: Oct 01, 2021. 08:52 PM
+10/01/2021 08:52:46 PM version 2021.09
+10/01/2021 08:52:46 PM Stand-alone RAP.py run - TDT tool did not run!
+10/01/2021 08:52:46 PM Config file used: RAP.cfg
+10/01/2021 08:52:46 PM Survey Data being used: C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP_2021\data\Regeneration Assessment Program_27-Sep-21_06-49\data
+10/01/2021 08:52:46 PM All variables from the config file:
+{'CALC': {'default_plot_area': '8',
+          'max_height': '40',
+          'max_num_of_t_per_plot': '6',
+          'min_height': '0.5',
+          'num_of_plots': '8',
+          'num_of_trees_4_spcomp': '2'},
+ 'INPUT': {'inputdatafolderpath': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                                  'Ontario\\2021\\RAP_2021\\data\\Regeneration '
+                                  'Assessment Program_27-Sep-21_06-49\\data'},
+ 'LOG': {'debug': 'False'},
+ 'OUTPUT': {'outputfolderpath': 'C:\\TEMP\\RAP2021_output'},
+ 'PDF': {'ref_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                       'Ontario\\2021\\RAP\\script\\pdf_to_post\\ref',
+         'report_folder': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                          'Ontario\\2021\\RAP\\script\\pdf_to_post\\reports'},
+ 'SHP': {'area_ha_fieldname': 'Area_ha',
+         'dist_fieldname': 'District',
+         'fmu_fieldname': 'FMU',
+         'num_clus_fieldname': 'NumCluster',
+         'plot_size_fieldname': 'PlotSize_m',
+         'project_id_fieldname': 'ProjectID',
+         'project_shpfile': 'C:\\Users\\kimdan\\OneDrive - Government of '
+                            'Ontario\\2021\\RAP_2021\\workspace\\scripts\\script\\Proj_shp\\RAP_2021.shp',
+         'shp2sqlite_tablename': 'projects_shp',
+         'silvsys_fieldname': 'SILVSYS'},
+ 'SPC': {'csv': 'SpeciesGroup.csv'},
+ 'SQLITE': {'clus_summary_tblname': 'Cluster_Summary',
+            'fin_proj_id': 'fin_proj_id',
+            'geo_check_fieldname': 'geo_proj_id',
+            'plot_summary_tblname': 'Plot_Summary',
+            'proj_id_override': 'ProjIDManualOverride',
+            'proj_summary_tblname': 'Project_Summary',
+            'unique_id_fieldname': 'unique_id'}}
+10/01/2021 08:52:46 PM spc_to_check = ['AB', 'AW', 'BD', 'BE', 'BF', 'BN', 'BW', 'BY', 'CB', 'CE', 'CW', 'EW', 'EX', 'HE', 'HI', 'IW', 'LA', 'MH', 'MR', 'MS', 'OB', 'OR', 'OW', 'OX', 'PB', 'PJ', 'PL', 'PO', 'PR', 'PS', 'PT', 'PW', 'SB', 'SN', 'SR', 'SW', 'SX']
+10/01/2021 08:52:46 PM spc_group_dict = {'AX': ['AB', 'AW'], 'BD': ['BD'], 'BE': ['BE'], 'BF': ['BF'], 'BN': ['BN'], 'BW': ['BW'], 'BY': ['BY'], 'CB': ['CB'], 'CE': ['CE', 'CW'], 'EX': ['EW', 'EX'], 'HE': ['HE'], 'HI': ['HI'], 'IW': ['IW'], 'LA': ['LA'], 'MH': ['MH'], 'MR': ['MR'], 'MS': ['MS'], 'OX': ['OB', 'OR', 'OW', 'OX'], 'PO': ['PB', 'PL', 'PO', 'PT'], 'PJ': ['PJ'], 'PX': ['PR', 'PS'], 'PW': ['PW'], 'SX': ['SB', 'SN', 'SR', 'SW', 'SX']}
+10/01/2021 08:52:46 PM 
+
+10/01/2021 08:52:46 PM --> Running csv2sqlite module
+10/01/2021 08:52:46 PM working on 'Clearcut_Survey_v2021'
+10/01/2021 08:52:46 PM Clearcut_Survey_v2021 does not have latitude or longitude field. Looking for X & Y fields instead...
+10/01/2021 08:52:46 PM In the table, Clearcut_Survey_v2021, fieldname 'X' has been renamed to 'longitude'
+10/01/2021 08:52:46 PM In the table, Clearcut_Survey_v2021, fieldname 'Y' has been renamed to 'latitude'
+10/01/2021 08:52:46 PM 156 rows have been added to 'Clearcut_Survey_v2021' table in the sqlite database.
+10/01/2021 08:52:46 PM working on 'Shelterwood_Survey_v2021'
+10/01/2021 08:52:46 PM Shelterwood_Survey_v2021 does not have latitude or longitude field. Looking for X & Y fields instead...
+10/01/2021 08:52:46 PM In the table, Shelterwood_Survey_v2021, fieldname 'X' has been renamed to 'longitude'
+10/01/2021 08:52:46 PM In the table, Shelterwood_Survey_v2021, fieldname 'Y' has been renamed to 'latitude'
+10/01/2021 08:52:46 PM 2 rows have been added to 'Shelterwood_Survey_v2021' table in the sqlite database.
+10/01/2021 08:52:46 PM 
+
+10/01/2021 08:52:46 PM --> Running shp2sqlite module
+10/01/2021 08:52:46 PM Running dict_lst_to_sqlite() to create a new table called projects_shp
+10/01/2021 08:52:46 PM 48 rows have been successfully transferred to projects_shp.
+10/01/2021 08:52:46 PM 
+
+10/01/2021 08:52:46 PM --> Running determine_project_id module
+10/01/2021 08:52:46 PM Opened C:\Users\kimdan\OneDrive - Government of Ontario\2021\RAP_2021\workspace\scripts\script\Proj_shp\RAP_2021.shp
+10/01/2021 08:52:46 PM Adding geo check field
+10/01/2021 08:52:46 PM Running determine_project_id module to geographically check the projectid
+10/01/2021 08:52:47 PM Determining final ProjectID
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc3: orig = , new = TIM-Gil01, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc4: orig = , new = TIM-Gil01, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc5: orig = , new = TIM-Gil01, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc6: orig = , new = TIM-Gil01, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc7: orig = , new = TIM-Gil01, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc8: orig = , new = TIM-Gil01, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc58: orig = Weyerhauser-6, new = NOR-WEYERHAUSER-6, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc60: orig = Weyerhauser-6, new = NOR-WEYERHAUSER-6, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc61: orig = Weyerhauser-6, new = NOR-WEYERHAUSER-6, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc62: orig = Weyerhauser-6, new = NOR-WEYERHAUSER-6, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc63: orig = Weyerhauser-6, new = NOR-WEYERHAUSER-6, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc64: orig = Weyerhauser-6, new = NOR-WEYERHAUSER-6, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc65: orig = Weyerhauser-6, new = NOR-WEYERHAUSER-6, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc66: orig = Weyerhauser-6, new = NOR-WEYERHAUSER-6, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc67: orig = Weyerhauser-6, new = NOR-WEYERHAUSER-6, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc68: orig = Weyerhauser-6, new = NOR-WEYERHAUSER-6, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc69: orig = Weyerhauser-6, new = NOR-WEYERHAUSER-6, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc70: orig = Weyerhauser-6, new = NOR-WEYERHAUSER-6, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc72: orig = Weyerhauser-6, new = NOR-WEYERHAUSER-6, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc73: orig = TIM-TF-01, new = TIM-TF01, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc74: orig = TIM-TF-01, new = TIM-TF01, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc75: orig = TIM-TF-01, new = TIM-TF01, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc76: orig = TIM-TF-01, new = TIM-TF01, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc77: orig = TIM-TF-01, new = TIM-TF01, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc78: orig = TIM-TF-01, new = TIM-TF01, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc79: orig = TIM-TF-01, new = TIM-TF01, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. cc80: orig = TIM-TF-01, new = TIM-TF01, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. sh1: orig = , new = TIM-Gil01, reason = geographic
+10/01/2021 08:52:47 PM Overriding ProjectID of record no. sh2: orig = , new = TIM-Gil01, reason = geographic
+10/01/2021 08:52:47 PM List of ProjectIDs found in the shpfile: ['NOR-LASALLE-3', 'WAW-ALG-6821-01', 'WAW-NAG-1273', 'TIM-TF01', 'NOR-PAPINEAU-3', 'NOR-PAPINEAU-9', 'CHA-PINE-2021-BLK-107', 'SAU-NSF-1', 'NOR-KLOCKS-10', 'WAW-NAG-1345', 'NOR-POITOIS-13', 'NOR-KLOCKS-14', 'NOR-PEDLEY-11', 'NOR-PAPINEAU-2', 'NOR-PAPINEAU-6', 'NOR-HWY63-4', 'NOR-HWY805-11', 'NOR-PAPINEAU-5', 'WAW-ALG-318', 'NOR-LASALLE-2', 'WAW-NAG-790', 'NOR-HWY11-5', 'WAW-MAG-04-X100', 'NOR-PAPINEAU-8', 'NOR-HWY63-13', 'CHA-PINE-2021-BLK-97', 'NOR-JANES-8', 'NOR-LASALLE-10', 'CHA-MISS-2021-BLK-15', 'WAW-ALG-6821-02', 'SAU-NSF-3', 'NOR-BERTRAM-7', 'WAW-ALG-N7809', 'WAW-NAG-318', 'NOR-HWY805-7', 'NOR-PAPINEAU-4', 'CHA-MISS-2021-BLK-17', 'WAW-ALG-6823', 'NOR-JANES-9', 'NOR-SECORD-12', 'NOR-JANES-15', 'SAU-NSF-4', 'TIM-GIL01', 'NOR-KLOCKS-12', 'NOR-LASALLE-14', 'NOR-WEYERHAUSER-6', 'WAW-NAG-395', 'SAU-NSF-2']
+10/01/2021 08:52:47 PM !!!! WARNING: There are user-specified ProjectIDs that doesn't match the shpfile's ProjectIDs !!!!
+10/01/2021 08:52:47 PM !!!! Invalid Project ID: Practice1,  Occurrence: 1 !!!!
+10/01/2021 08:52:47 PM !!!! Invalid Project ID: Practice site 1,  Occurrence: 1 !!!!
+10/01/2021 08:52:47 PM !!!! Invalid Project ID: Weyerhauser-6,  Occurrence: 1 !!!!
+10/01/2021 08:52:47 PM !!!! SILVSYS Mismatch found: UniqueID: cc58, ProjectID: NOR-WEYERHAUSER-6, Field SILVSYS: CC, Shpfile SILVSYS: SH
+10/01/2021 08:52:47 PM !!!! SILVSYS Mismatch found: UniqueID: cc60, ProjectID: NOR-WEYERHAUSER-6, Field SILVSYS: CC, Shpfile SILVSYS: SH
+10/01/2021 08:52:47 PM !!!! SILVSYS Mismatch found: UniqueID: cc61, ProjectID: NOR-WEYERHAUSER-6, Field SILVSYS: CC, Shpfile SILVSYS: SH
+10/01/2021 08:52:47 PM !!!! SILVSYS Mismatch found: UniqueID: cc62, ProjectID: NOR-WEYERHAUSER-6, Field SILVSYS: CC, Shpfile SILVSYS: SH
+10/01/2021 08:52:47 PM !!!! SILVSYS Mismatch found: UniqueID: cc63, ProjectID: NOR-WEYERHAUSER-6, Field SILVSYS: CC, Shpfile SILVSYS: SH
+10/01/2021 08:52:47 PM !!!! SILVSYS Mismatch found: UniqueID: cc64, ProjectID: NOR-WEYERHAUSER-6, Field SILVSYS: CC, Shpfile SILVSYS: SH
+10/01/2021 08:52:47 PM !!!! SILVSYS Mismatch found: UniqueID: cc65, ProjectID: NOR-WEYERHAUSER-6, Field SILVSYS: CC, Shpfile SILVSYS: SH
+10/01/2021 08:52:47 PM !!!! SILVSYS Mismatch found: UniqueID: cc66, ProjectID: NOR-WEYERHAUSER-6, Field SILVSYS: CC, Shpfile SILVSYS: SH
+10/01/2021 08:52:47 PM !!!! SILVSYS Mismatch found: UniqueID: cc67, ProjectID: NOR-WEYERHAUSER-6, Field SILVSYS: CC, Shpfile SILVSYS: SH
+10/01/2021 08:52:47 PM !!!! SILVSYS Mismatch found: UniqueID: cc68, ProjectID: NOR-WEYERHAUSER-6, Field SILVSYS: CC, Shpfile SILVSYS: SH
+10/01/2021 08:52:47 PM !!!! SILVSYS Mismatch found: UniqueID: cc69, ProjectID: NOR-WEYERHAUSER-6, Field SILVSYS: CC, Shpfile SILVSYS: SH
+10/01/2021 08:52:47 PM !!!! SILVSYS Mismatch found: UniqueID: cc70, ProjectID: NOR-WEYERHAUSER-6, Field SILVSYS: CC, Shpfile SILVSYS: SH
+10/01/2021 08:52:47 PM !!!! SILVSYS Mismatch found: UniqueID: cc72, ProjectID: NOR-WEYERHAUSER-6, Field SILVSYS: CC, Shpfile SILVSYS: SH
+10/01/2021 08:52:47 PM !!!! SILVSYS Mismatch found: UniqueID: sh1, ProjectID: TIM-Gil01, Field SILVSYS: SH, Shpfile SILVSYS: CC
+10/01/2021 08:52:47 PM !!!! SILVSYS Mismatch found: UniqueID: sh2, ProjectID: TIM-Gil01, Field SILVSYS: SH, Shpfile SILVSYS: CC
+10/01/2021 08:52:47 PM ProjectID Summary: {'PRACTICE SITE 1': 1, 'WAW-NAG-1273': 50, 'PRACTICE1': 1, 'TIM-GIL01': 11, 'TIM-TF01': 8, 'WEYERHAUSER-6': 1, 'NOR-WEYERHAUSER-6': 13, 'NOR-HWY11-5': 34, 'WAW-NAG-1345': 25, 'WAW-MAG-04-X100': 14}
+10/01/2021 08:52:47 PM Populating (Updating) SQLite geo_check field with ProjectIDs

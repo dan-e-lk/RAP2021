@@ -41,12 +41,12 @@ class Csv2sqlite:
 
 	def generate_db_name(self):
 		
-		# name of the new dbf will be SEM_NER_200110105924 where the number is the date and time.
-		prefix = "SEM_NER_"
+		# name of the new dbf will be RAP_200110105924 where the number is the date and time.
+		prefix = "RAP_"
 		suffix = ".sqlite"
 		datetime = common_functions.datetime_stamp()
-		self.db_name = '%s%s%s'%(prefix,datetime,suffix)  # eg. SEM_NER_200110110426.sqlite
-		self.db_fullpath_new = os.path.join(self.db_path, self.db_name) # eg. C:\DanielKim\temp\SEM_NER_200110110426.sqlite
+		self.db_name = '%s%s%s'%(prefix,datetime,suffix)  # eg. RAP_200110110426.sqlite
+		self.db_fullpath_new = os.path.join(self.db_path, self.db_name) # eg. C:\DanielKim\temp\RAP_200110110426.sqlite
 
 
 
@@ -59,7 +59,7 @@ class Csv2sqlite:
 		if os.path.isdir(self.csvfolderpath):
 			self.csvfile_list = [os.path.join(self.csvfolderpath,file) for file in os.listdir(self.csvfolderpath) if file.upper()[-4:] == '.CSV']
 			if len(self.csvfile_list) == 0:
-				self.logger.info('* WARNING: No csv file found in the directory: %s'%self.csvfolderpath)
+				self.logger.info('*** ERROR: No csv file found in the directory: %s'%self.csvfolderpath)
 		else:
 			self.logger.info('*** ERROR: The directory  %s  does not exist'%self.csvfolderpath)
 
@@ -68,7 +68,9 @@ class Csv2sqlite:
 
 	def csv_to_sqlite(self):
 		"""
-		This module assumes that the fieldnames in those csv files have no special character
+		This module assumes that the fieldnames in those csv files are unique and have no special character.
+		Reads the input csv files and outputs it into the sqlite database.
+		This module is not specific to RAP project csv files, and can be applied to any csv files.
 		"""
 
 		for csv_fullpath in self.csvfile_list:
@@ -145,7 +147,7 @@ class Csv2sqlite:
 			# 	instead, they have X, and Y fields. So we need to manually create latitude and longitude fields.
 			# this is done by renaming attribute names. X = longitude, Y = latitude
 			if 'longitude' not in fieldnames or 'latitude' not in fieldnames:
-				self.logger.info("* WARNING: %s does not have latitude or longitude field."%table_name)
+				self.logger.info("%s does not have latitude or longitude field. Looking for X & Y fields instead..."%table_name)
 				for orig, new in {'X':'longitude', 'Y':'latitude'}.items():
 					if orig in fieldnames:
 						rename_sql = "ALTER TABLE %s RENAME COLUMN %s TO %s"%(table_name, orig, new) #eg. ALTER TABLE cluster_survey RENAME COLUMN X TO longitude
@@ -156,7 +158,7 @@ class Csv2sqlite:
 							if fieldname == orig:
 								fieldnames[index] = new
 
-			# Note t hat starting Dec 2020, if the user have not collected lat long, the X, Y value will be blank instead of 0, 0.
+			# Note that starting Dec 2020, if the user have not collected lat long, the X, Y value will be blank instead of 0, 0.
 
 			# delete test data
 			if self.ignore_testdata == True:
@@ -200,5 +202,6 @@ if __name__ == '__main__':
 
 	test = Csv2sqlite(csvfolderpath,db_output_path,unique_id_fieldname,logger)
 	# print(test.db_fullpath_new)
-	# print(test.tablenames_n_rec_count)	# {'l386505_Project_Survey': [['ProjectID', 'Date', 'DistrictName', 'ForestManagementUnit', 'Surveyors', 'Comments', 'Photos', 'longitude', 'latitude', 'hae'], 1], 'l387081_Cluster_Survey_Testing_': [['ClusterNumber',..
+	# print(test.tablenames_n_rec_count)	
+# {'l386505_Project_Survey': [['ProjectID', 'Date', 'DistrictName', 'ForestManagementUnit', 'Surveyors', 'Comments', 'Photos', 'longitude', 'latitude', 'hae'], 1], 'l387081_Cluster_Survey_Testing_': [['ClusterNumber',..
 

@@ -61,18 +61,22 @@ class Shp2sqlite:
 		layer_def = layer.GetLayerDefn()
 		for n in range(layer_def.GetFieldCount()):
 			field_def = layer_def.GetFieldDefn(n)
-			self.attr_names.append(field_def.name)
+			# self.attr_names.append(field_def.name)
+			self.attr_names.append(field_def.name.upper())
 
 		# grab each record in dictionary form
 		temp_shp_in_dict = []
 		for n in range(self.rec_count):
 			temp_shp_in_dict.append(layer.GetFeature(n).items()) #eg. {'OBJECTID': 3, 'ProjectID': 'TheTrail', 'Area_ha': 29.7181,..}
 
+		# python's dictionary is case sensitive - convert all the keys (fieldnames) to uppercase
 		# in shp_in_dict, None objects must be converted to an empty string - so it can be entered into the sqlite
 		for row in temp_shp_in_dict:
-			new_row = {k:(str(v) if v != None else '') for k, v in row.items()}
-			self.shp_in_dict.append(new_row) #eg. {'OBJECTID': 3, 'ProjectID': 'TheTrail', 'Area_ha': 29.7181,..}
+			new_row = {k.upper():(str(v) if v != None else '') for k, v in row.items()}
+			self.shp_in_dict.append(new_row) #eg. {'OBJECTID': 3, 'PROJECTID': 'THETRAIL', 'AREA_HA': 29.7181,..}
 
+		self.logger.debug('Completed running shp2sqlite.read_shpfile()')
+		self.logger.debug('First record in self.shp_in_dict: %s'%self.shp_in_dict[0])
 
 
 	def check_records(self):
@@ -81,11 +85,11 @@ class Shp2sqlite:
 		self.logger.debug('Running shp2sqlite.check_records()')
 
 		# first, make sure the project id field exists
-		if self.prjID_field not in self.attr_names:
+		if self.prjID_field.upper() not in self.attr_names:
 			self.logger.info('!!!! %s field does not exist in the shapefile !!!!'%self.prjID_field)
 
 		# check if there is a duplicate
-		proj_id_values_lst = [rec[self.prjID_field] for rec in self.shp_in_dict]
+		proj_id_values_lst = [rec[self.prjID_field.upper()] for rec in self.shp_in_dict]
 		proj_id_values_set = set(proj_id_values_lst)
 		# if duplicate is present, len(lst) is greater than len(set)
 		if len(proj_id_values_lst) > len(proj_id_values_set):
@@ -106,7 +110,7 @@ class Shp2sqlite:
 		# check lat lon of the centre point
 		# lat should be between 41 and 57
 		# lon should be between -96 and -73
-		latlon = [(float(rec['lat']),float(rec['lon'])) for rec in self.shp_in_dict]
+		latlon = [(float(rec['LAT']),float(rec['LON'])) for rec in self.shp_in_dict]
 		latlon_error = 0
 		for rec in latlon:
 			lat = rec[0]

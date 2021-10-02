@@ -2,7 +2,7 @@
 
 import os, time
 from TDT import executeTDT
-import SEM
+import RAP
 
 
 # running TDT tool

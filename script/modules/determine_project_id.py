@@ -7,7 +7,21 @@
 # values in the "ProjectID" field must be unique (i.e. no dupilcates in ProjectID)
 # be in NAD83 or WGS84 geographic coordinates. ??? may be not.
 # 
-# The sqlite db must have one table with name ...Cluster_Survey... and another with name ...Project_Survey...
+# Unfortunately for this 2021 season, there are more than one projectID field in the terraflex form (and thus in the sqlite table)
+# 1. ProjectID: The original ProjectID field ,but this one is archieved and is NO LONGER BEING USED. Ignore this field!!
+# 2. ProjectID02: This is where the field staff have entered. So USE THIS for both Clearcut and Shelterwood forms
+# 3. ProjIDManualOverride: Default value = 'Use GPS' If the staff entered an incorrect ProjectID02, then the developer can manually override it using this field.
+#						If the value of this field is anything other than 'Use GPS', then this will be the final ProjectID
+# 4. geo_check_fieldname (geo_proj_id): for each cluster, this tool spatially determines to which project boundary the cluster point lies in.
+# 5. fin_proj_id: The final projectID. Here's the hierarchy:
+#			if ProjIDManualOverride != 'Use GPS':
+#				fin_proj_id = ProjIDManualOverride 
+#			elif geo_check_fieldname != None: 
+#			 	fin_proj_id = geo_check_fieldname
+#			else:
+#			 	fin_proj_id = ProjectID02
+
+# The sqlite db must have one table with name 'Clearcut_Survey_v2021' and another with name 'Shelterwood_Survey_v2021'
 #
 # reference: 
 # https://pcjericks.github.io/py-gdalogr-cookbook/projection.html
@@ -35,14 +49,17 @@ class Determine_project_id:
 		# static variables from the config file:
 		self.prj_shpfile = cfg_dict['SHP']['project_shpfile']
 		self.prjID_field = cfg_dict['SHP']['project_id_fieldname']
+		self.silvsys_fieldname = cfg_dict['SHP']['silvsys_fieldname']
+		self.shp2sqlite_tablename = cfg_dict['SHP']['shp2sqlite_tablename']		
 		self.geo_check_field = cfg_dict['SQLITE']['geo_check_fieldname'] # this field will be created in the sqlite database for each record in cluster table as each record gets assigned to each projectid.
-		self.proj_id_field = cfg_dict['SQLITE']['fin_proj_id']
+		self.fin_proj_id_field = cfg_dict['SQLITE']['fin_proj_id']
 		self.proj_id_override = cfg_dict['SQLITE']['proj_id_override'] # if this field is filled out by the end-user, it should override the geomatrically found project id.
 		self.unique_id_field = cfg_dict['SQLITE']['unique_id_fieldname']
 
+
 		# other static and non-static variables that brought into this class:
 		self.db_filepath = db_filepath
-		self.tablenames_n_rec_count = tablenames_n_rec_count # eg. {'l386505_Project_Survey': [['ProjectID', 'Date', 'DistrictName', 'ForestManagementUnit'],2], 'l387081_Cluster_Survey_Testing_': [['ClusterNumber',..
+		self.tablenames_n_rec_count = tablenames_n_rec_count # eg. {'Clearcut_Survey_v2021': [['ProjectID02', 'Date', 'DistrictName', 'ForestManagementUnit', ...],2], 'Shelterwood_Survey_v2021': [['ProjectID02', 'Date', 'DistrictName', 'ForestManagementUnit', ...],2]}
 		self.logger = logger
 
 		# instance variables to be assigned as we go through each module.
@@ -53,11 +70,15 @@ class Determine_project_id:
 		self.attribute_list = []  # attribute list of the input shapefile. all attribute names will be in upper class
 		self.con = None # sqlite connection object
 		self.cur = None
-		self.cluster_tbl_name = ''
-		self.project_tbl_name = ''
-		self.cluster_coords = {} # eg. {1: [48.50010352, -81.18260821], 2: [48.50010352, -81.18215905],..} where the keys are the unique ids.
-		self.override_dict = {} # eg. {1: 'Use GPS', 2: 'Use GPS', 3: 'TestPrj-01',...}
-		self.uniq_id_to_proj_id = {} #eg. {1: ['FUS49', 'FUS49'], ...5: ['FUS49', 'TestProj-01']}  where 'FUS49' is geometrically matching project id and 'TestProj-01' is the end-user override project id.
+		self.clearcut_tbl_name = 'Clearcut_Survey_v2021'
+		self.shelterwood_tbl_name = 'Shelterwood_Survey_v2021'
+		self.clearcut_coords = {} # eg. {1: [48.50010352, -81.18260821], 2: [48.50010352, -81.18215905],..} where the keys are the unique ids.
+		self.shelterwood_coords = {} # eg. {1: [48.50010352, -81.18260821], 2: [48.50010352, -81.18215905],..} where the keys are the unique ids.
+		self.override_dict = {} # developer's override projectid eg. {cc1: 'Use GPS', cc2: 'Use GPS',...., sh1: 'TestPrj-01',...}
+		self.user_spec_proj_id_field = 'ProjectID02'
+		self.user_spec_proj_id = {} # user specified projectid (ProjectID02)
+		self.geo_calc_proj_id = {} # geographically matching projectid. eg. {'cc1': None, ... 'cc5': 'TIM-Gil01', 'cc6': 'TIM-Gil01', 'cc7': 'TIM-Gil01', ... 'cc11': None,...}
+		self.uniq_id_to_proj_id = {} # final project ids eg. {'cc1': 'TIM-GIL01', 'cc2': 'TIM-GIL01', 'cc3': 'TIM-Gil01', 'cc4': 'TIM-Gil01', ...., 'cc10': 'NOR-HWY11-5',..., 'sh1': 'TIM-Gil01'}
 		self.summary_dict = {} # eg. {'TestProj-01': 1, 'FUS49': 4, -1: 0}
 
 		self.logger.info('\n')
@@ -115,9 +136,9 @@ class Determine_project_id:
 		self.spatialRef = self.layer.GetSpatialRef()
 		if not self.spatialRef.IsGeographic():
 			self.logger.info('This is not geographic \nMake sure your shapefile is in WGS84')
-			raise Exception('Make sure your shapefile is in WGS84 geographic')
+			raise Exception('Make sure your shapefile is in WGS84 geographic coordinates')
 		else:
-			self.logger.debug('The shapefile is in geographic')
+			self.logger.debug('The shapefile is in geographic coordinates')
 
 
 
@@ -129,27 +150,19 @@ class Determine_project_id:
 		self.logger.info('Adding geo check field')
 		self.initiate_connection()
 
-		# find the cluster and project table name
-		cluster_tbl_name = [i for i in self.tablenames_n_rec_count.keys() if "CLUSTER_SURVEY" in i.upper()] # should result in one item such as ['l387081_Cluster_Survey_Testing_']
-		project_tbl_name = [i for i in self.tablenames_n_rec_count.keys() if "PROJECT_SURVEY" in i.upper()]
-		if len(cluster_tbl_name) != 1:
-			raise Exception("%s Cluster_survey table(s) found in sqlite database. There should be 1 table."%len(cluster_tbl_name))
-		if len(project_tbl_name) != 1:
-			raise Exception("%s Project_survey table(s) found in sqlite database. There should be 1 table."%len(project_tbl_name))			
-		self.cluster_tbl_name = cluster_tbl_name[0]
-		self.project_tbl_name = project_tbl_name[0]
-
-		# Create 'geo check' field and 'final project id' field for the Cluster table
-		table = self.cluster_tbl_name
-		for f in [self.geo_check_field, self.proj_id_field]:
-			if f.upper() not in [i.upper() for i in self.tablenames_n_rec_count[table][0]]:
-				add_field_sql = "ALTER TABLE %s ADD %s CHAR;"%(table,f)
-				self.logger.debug(add_field_sql)
-				self.cur.execute(add_field_sql)
-				# also update the tablenames_n_rec_count
-				self.tablenames_n_rec_count[table][0].append(f)
-			else:
-				self.logger.info('!!%s field already exists in %s!! this may cause a problem!'%(f,table))
+		# Create 'geo check' field and 'final project id' field for both tables
+		# 'geo check' field will be used when intersecting each cluster points to the 
+		# project boundaries to determine the record's project ID geographically
+		for table in [self.clearcut_tbl_name, self.shelterwood_tbl_name]:
+			for f in [self.geo_check_field, self.fin_proj_id_field]:
+				if f.upper() not in [i.upper() for i in self.tablenames_n_rec_count[table][0]]:
+					add_field_sql = "ALTER TABLE %s ADD %s CHAR;"%(table,f)
+					self.logger.debug(add_field_sql)
+					self.cur.execute(add_field_sql)
+					# also update the tablenames_n_rec_count
+					self.tablenames_n_rec_count[table][0].append(f)
+				else:
+					self.logger.info('!!%s field already exists in %s!! this may cause a problem!'%(f,table))
 
 
 		self.close_connection()
@@ -159,23 +172,30 @@ class Determine_project_id:
 
 	def get_coord_from_sqlite(self):
 		"""
-		connect to the sqlite database. recognize the cluster_survey table. 
-		grab coordiantes and the unique id from each record and put them in a dictionary form -> cluster_coords
+		connect to the sqlite database. 
+		grab coordiantes and the unique id from each record and put them in a dictionary form -> clearcut_coords and shelterwood_coords
 		"""
 		self.initiate_connection()
 		self.logger.debug('grabbing coordiantes and the unique id from the cluster_survey sqlite table')
 
-
-		# write sql
-		# select_sql = "SELECT unique_id, latitude, longitude FROM l387081_Cluster_Survey_Testing_"
-		select_sql = "SELECT %s, latitude, longitude FROM %s"%(self.unique_id_field, self.cluster_tbl_name)
+		# Clearcut
+		# select_sql = "SELECT unique_id, latitude, longitude FROM CLEARCUT_SURVEY_V2021"
+		select_sql = "SELECT %s, latitude, longitude FROM %s"%(self.unique_id_field, self.clearcut_tbl_name)
 		self.logger.debug(select_sql)
-
 		# run select query to grab coordinates and the unique ids
 		# Note that starting Dec 2020, if the user have not collected lat long, the X, Y value will be blank instead of 0, 0.
-		self.cluster_coords = {int(row[0]): [float(row[1] or 0),float(row[2] or 0)] for row in self.cur.execute(select_sql)} # eg. {1: [48.50010352, -81.18260821], 2: [48.50010352, -81.18215905],..} where the keys are the unique ids.
+		self.clearcut_coords = {int(row[0]): [float(row[1] or 0),float(row[2] or 0)] for row in self.cur.execute(select_sql)} # eg. {1: [48.50010352, -81.18260821], 2: [48.50010352, -81.18215905],..} where the keys are the unique ids.
 
-		self.logger.debug(str(self.cluster_coords))
+		# Shelterwood
+		# select_sql = "SELECT unique_id, latitude, longitude FROM SHELTERWOOD_SURVEY_V2021"
+		select_sql = "SELECT %s, latitude, longitude FROM %s"%(self.unique_id_field, self.shelterwood_tbl_name)
+		self.logger.debug(select_sql)
+		# run select query to grab coordinates and the unique ids
+		# Note that starting Dec 2020, if the user have not collected lat long, the X, Y value will be blank instead of 0, 0.
+		self.shelterwood_coords = {int(row[0]): [float(row[1] or 0),float(row[2] or 0)] for row in self.cur.execute(select_sql)} # eg. {1: [48.50010352, -81.18260821], 2: [48.50010352, -81.18215905],..} where the keys are the unique ids.
+
+		self.logger.debug("Clearcut Coordinates: %s"%self.clearcut_coords)
+		self.logger.debug("Shelterwood Coordinates: %s"%self.shelterwood_coords)
 
 		self.close_connection()
 
@@ -188,64 +208,156 @@ class Determine_project_id:
 		where the data has been collected.
 		"""
 		self.initiate_connection()
-		self.logger.debug('grabbing user-specified project id and the unique id from the cluster_survey sqlite table')
+		self.logger.debug('grabbing proj_id_override and the unique_id from the sqlite tables')
 
-
-		# write sql
-		# select_sql = "SELECT unique_id, latitude, longitude FROM l387081_Cluster_Survey_Testing_"
-		select_sql = "SELECT %s, %s FROM %s"%(self.unique_id_field, self.proj_id_override, self.cluster_tbl_name)
+		# Clearcut
+		# select_sql = "SELECT unique_id, prj_id_override, ProjectID02 FROM CLEARCUT_SURVEY_V2021"
+		select_sql = "SELECT %s, %s, %s FROM %s"%(self.unique_id_field, self.proj_id_override, self.user_spec_proj_id_field, self.clearcut_tbl_name)
 		self.logger.debug(select_sql)
+		# run select query
+		cc_override_dict = {int(row[0]): str(row[1]) for row in self.cur.execute(select_sql)} # eg. {1: 'Use GPS', 2: 'Use GPS', 3: 'TestPrj-01',...}
+		cc_user_spec_proj_id = {int(row[0]): str(row[2]) for row in self.cur.execute(select_sql)} 
 
-		# run select query to grab coordinates and the unique ids
-		self.override_dict = {int(row[0]): str(row[1]) for row in self.cur.execute(select_sql)} # eg. {1: 'Use GPS', 2: 'Use GPS', 3: 'TestPrj-01',...}
-		self.logger.debug(str(self.override_dict))
+		# Shelterwood
+		# select_sql = "SELECT unique_id, prj_id_override, ProjectID02 FROM SHELTERWOOD_SURVEY_V2021"
+		select_sql = "SELECT %s, %s, %s FROM %s"%(self.unique_id_field, self.proj_id_override, self.user_spec_proj_id_field, self.shelterwood_tbl_name)
+		self.logger.debug(select_sql)
+		# run select query
+		sh_override_dict = {int(row[0]): str(row[1]) for row in self.cur.execute(select_sql)} # eg. {1: 'Use GPS', 2: 'Use GPS', 3: 'TestPrj-01',...}
+		sh_user_spec_proj_id = {int(row[0]): str(row[2]) for row in self.cur.execute(select_sql)} 
 
 		self.close_connection()
+
+		# combine the two dictionaries
+		for silvsys, dictionary in {'cc':cc_override_dict, 'sh':sh_override_dict}.items():
+			for uniq_id, value in dictionary.items():
+				self.override_dict[silvsys+str(uniq_id)] = value
+
+		for silvsys, dictionary in {'cc':cc_user_spec_proj_id, 'sh':sh_user_spec_proj_id}.items():
+			for uniq_id, value in dictionary.items():
+				self.user_spec_proj_id[silvsys+str(uniq_id)] = value
+
+		self.logger.debug("Override ProjectID Dict: %s"%self.override_dict) # eg. {cc1: 'Use GPS', cc2: 'Use GPS',...., sh1: 'TestPrj-01',...}
+		self.logger.debug("User specified ProjectID Dict: %s"%self.override_dict) # eg. {'cc1': None, 'cc2': None, 'cc3': 'TIM-Gil01', 'cc4': 'TIM-Gil01', ..., 'cc20': 'NOR-HWY11-5',...}
 
 
 
 	def determine_project_id(self):
 		"""
-		This is where it happens! Checking if the coordinates we have in the cluster_survey are within any of the project (block) polygon shapes.
-		However, if the record has self.project_id_override filled out by the end-user, that will be the project id of the record regardless of the coordinates.
+		This is where it happens! Checking if the coordinates we have for each clusters are within any of the project (block) polygon shapes.
+		if the record has self.project_id_override filled out by the end-user, that will be the project id of the record regardless of the coordinates.
+		else, if the record intersects a project boundary, that will be the final project id
+		else, if none of the above applies, the project id that the user has input will be the final project id.
 		"""
+		self.logger.info('Running determine_project_id module to geographically check the projectid')
 
 		# get a list of the features in the shapefile.
 		projects = [self.layer.GetFeature(i) for i in range(self.layer_featureCount)] # a list of ogr's feature objects https://gdal.org/python/osgeo.ogr.Feature-class.html
 		# self.logger.debug('%s\n%s\n%s\n%s\n'%(projects[0].items(),projects[0].geometry(),projects[0].keys(),projects[0].GetField(1)))
 
-		# iterate through cluster points
-		for uniq_id, coord in self.cluster_coords.items():
-			# create point geometry object
-			lat = coord[0]
-			lon = coord[1]
-			pt = ogr.Geometry(ogr.wkbPoint)
-			pt.AddPoint(lon, lat) # long, lat is apparently the default setting.
+		# iterate through Clearcut and Shelterwood coordinates
+		for silvsys, coordinates in {'cc':self.clearcut_coords, 'sh':self.shelterwood_coords}.items():
+			for uniq_id, coord in coordinates.items():
+				# create point geometry object
+				lat = coord[0]
+				lon = coord[1]
+				pt = ogr.Geometry(ogr.wkbPoint)
+				pt.AddPoint(lon, lat) # long, lat is apparently the default setting.
 
-			# iterate through project polygon shapes
-			matching_proj_id = None
-			for proj in projects:
-				# self.logger.debug('project geo = %s\npt geo = %s'%(proj.geometry(),pt))
+				# iterate through project polygon shapes
+				matching_proj_id = None
+				for proj in projects:
+					# Within is the method that checks if point a is within point b.
+					if pt.Within(proj.geometry()):
+						matching_proj_id = proj.items()[self.prjID_field] # proj.items() should give you something like {'Id': 2, 'ProjectID': '2'}
+						# if you get error here, it's because your ProjectID field in the shp file doesn't match with the one in config file (project_id_fieldname).
+						break
 
-				# Within is a method that checks if x is within y.
-				if pt.Within(proj.geometry()):
-					matching_proj_id = proj.items()[self.prjID_field] # proj.items() should give you something like {'Id': 2, 'ProjectID': '2'}
+				self.geo_calc_proj_id[silvsys + str(uniq_id)] = matching_proj_id # {cc1: 'FUS49', cc2: None,...}
+
+				# delete the point geometry object
+				del pt
+
+		self.logger.debug("geo_calc_proj_id = %s"%self.geo_calc_proj_id)
+		# geo_calc_proj_id = {'cc1': None, ... 'cc5': 'TIM-Gil01', 'cc6': 'TIM-Gil01', 'cc7': 'TIM-Gil01', ... 'cc11': None,...}
+
+
+		# now that we have all 3 ProjectID info (geo_calc_proj_id, user_spec_proj_id, and override_dict), we can decide the final projectID
+		self.logger.info("Determining final ProjectID")
+		for rec_num, user_proj_id in self.user_spec_proj_id.items():
+			final_proj_id = user_proj_id # by default the final project id is the one user has inputted
+			override_value = self.override_dict[rec_num]
+			geo_calc_value = self.geo_calc_proj_id[rec_num]
+			# if override project id is filled out, that's our final project id
+			if override_value.strip() not in ['','Use GPS'] and override_value != user_proj_id:
+				final_proj_id = override_value
+				self.logger.info("Overriding ProjectID of record no. %s: orig = %s, new = %s, reason = developer override"%(rec_num, user_proj_id, override_value))
+			# else if geographically calculated project id exists, that's our final project id
+			elif geo_calc_value != None and geo_calc_value != user_proj_id:
+				final_proj_id = geo_calc_value
+				self.logger.info("Overriding ProjectID of record no. %s: orig = %s, new = %s, reason = geographic"%(rec_num, user_proj_id, geo_calc_value))
+			
+			# warn if no project id found
+			if final_proj_id in ["", None]:
+				self.logger.info("!!!! WARNING: record no. %s has no ProjectID assigned !!!!"%rec_num)
+			
+			# record the final project id in a new dictionary
+			self.uniq_id_to_proj_id[rec_num] = final_proj_id
+
+		self.logger.debug("Unique ID to Project ID = \n%s"%self.uniq_id_to_proj_id)
+		# uniq_id_to_proj_id eg. {'cc1': 'TIM-GIL01', 'cc2': 'TIM-GIL01', 'cc3': 'TIM-Gil01', 'cc4': 'TIM-Gil01', ...., 'cc10': 'NOR-HWY11-5',..., 'sh1': 'TIM-Gil01'}
+
+	
+	def check_results(self):
+		# get list of projects from the sqlite projects_shp and see if that list matches with the project ids we have in uniq_id_to_proj_id
+		
+		self.initiate_connection()
+		self.logger.debug('Comparing the final ProjectIDs against the ProjectIDs in the shpfile')
+		# select_sql = "SELECT ProjectID FROM projects_shp"
+		select_sql = "SELECT %s FROM %s"%(self.prjID_field, self.shp2sqlite_tablename)
+		self.logger.debug(select_sql)
+		# run select query
+		shp_proj_id_lst = list(set([row[0].upper() for row in self.cur.execute(select_sql)])) # eg. ['TIM-GIL01','NOR-HWY11-5','WAW-NAG-1273'...]
+		self.logger.info("List of ProjectIDs found in the shpfile: %s"%shp_proj_id_lst)
+		self.close_connection()
+
+		# warn user if there's a projectID that doesn't match the one in the shpfile. (doesn't have to match case sensitivity)
+		proj_id_not_in_shp = {proj_id: 0 for uniq_id, proj_id in self.uniq_id_to_proj_id.items()}
+		err_count = 0
+		for uniq_id, proj_id in self.uniq_id_to_proj_id.items():
+			if proj_id.upper() not in shp_proj_id_lst:
+				err_count += 1
+				proj_id_not_in_shp[proj_id] += 1
+
+		if err_count > 0:
+			self.logger.info("!!!! WARNING: There are user-specified ProjectIDs that doesn't match the shpfile's ProjectIDs !!!!")
+			for proj_id, occurrence in proj_id_not_in_shp.items():
+				if occurrence > 0:
+					self.logger.info("!!!! Invalid Project ID: %s,  Occurrence: %s !!!!"%(proj_id, occurrence))
+
+
+
+	def check_silvsys(self):
+		# get list of projects from the sqlite projects_shp and see if that list matches with the project ids we have in uniq_id_to_proj_id
+		
+		self.initiate_connection()
+		self.logger.debug('Checking if the terraflex forms match the Silvsys in the shpfile')
+		# select_sql = "SELECT ProjectID FROM projects_shp"
+		select_sql = "SELECT %s, %s FROM %s"%(self.prjID_field, self.silvsys_fieldname, self.shp2sqlite_tablename)
+		self.logger.debug(select_sql)
+		# run select query
+		shp_silvsys_lst = [[row[0].upper(), row[1].upper()] for row in self.cur.execute(select_sql)] # eg. [['TIM-GIL01', 'CC'], ['NOR-HWY11-5', 'CC'], ['NOR-WEYERHAUSER-6', 'SH']...]
+		self.close_connection()
+
+		# warn user if the silvicultural system of the form doesn't match with the one in the shpfile.
+		silvsys_mismatch = []
+		for uniq_id, proj_id in self.uniq_id_to_proj_id.items():
+			field_silvsys = uniq_id[:2].upper() #eg. 'CC' or 'SH'
+			for shp_record in shp_silvsys_lst:
+				if shp_record[0] == proj_id.upper() and shp_record[1] != field_silvsys:
+					silvsys_mismatch.append([uniq_id, proj_id, field_silvsys, shp_record[1]]) # eg. ['cc1', 'TIM-GIL01', 'CC', 'SH']
+					self.logger.info("!!!! SILVSYS Mismatch found: UniqueID: %s, ProjectID: %s, Field SILVSYS: %s, Shpfile SILVSYS: %s"%(uniq_id, proj_id, field_silvsys, shp_record[1]))
 					break
-
-			self.uniq_id_to_proj_id[uniq_id] = [matching_proj_id] # {1: ['FUS49'], 2: ['FUS49'],...}
-
-			# delete the point geometry object
-			del pt
-
-		# put the override values to the uniq_id_to_proj_id dictionary only if it's been filled out by the end-user (i.e. not empty or 'Use GPS').
-		for uniq_id, prj_id_list in self.uniq_id_to_proj_id.items():
-			override_value = self.override_dict[uniq_id]
-			if override_value == None or override_value.strip() in ['','Use GPS']:
-				self.uniq_id_to_proj_id[uniq_id].append(prj_id_list[0])
-			else:
-				self.uniq_id_to_proj_id[uniq_id].append(self.override_dict[uniq_id]) # {1: ['FUS49', 'FUS49'], ... 5: ['FUS49', 'TestProj-01']}
-
-		self.logger.debug('%s to %s [geographic, final]: %s'%(self.unique_id_field, self.prjID_field, self.uniq_id_to_proj_id))
 
 
 
@@ -255,33 +367,19 @@ class Determine_project_id:
 		report the number of points for each project
 		"""
 		total_clusters = 0
-		uniq_id_of_clusters_without_projID = [] # terrible name.. but descriptive at the least.
 
 		# get unique project ids
-		projID_list = [str(i[1]) for i in self.uniq_id_to_proj_id.values() if i != None]
-		projIDs_found = list(set(projID_list)) # to remove duplicate projIDs
+		projID_list = [i.upper() for i in self.uniq_id_to_proj_id.values() if i != None]
+		projIDs_found = list(set(projID_list)) # eg. ['NOR-HWY805-7', 'WAW-NAG-790', 'NOR-PAPINEAU-3'...]
 		self.summary_dict = {prjID: 0 for prjID in projIDs_found}
 
 		# populate summary_dict
 		for uniq_id, proj_id in self.uniq_id_to_proj_id.items():
 			total_clusters += 1
-			if proj_id[1] == None: 
-				uniq_id_of_clusters_without_projID.append(uniq_id)
-			else:
-				self.summary_dict[str(proj_id[1])] += 1
+			self.summary_dict[proj_id.upper()] += 1
 
-		num_of_clusters_without_projID = len(uniq_id_of_clusters_without_projID)
-		self.summary_dict[-1] = num_of_clusters_without_projID  # eg. summary_dict = {'TestProj-01': 1, 'FUS49': 4, -1: 0}
+		self.logger.info("ProjectID Summary: %s"%self.summary_dict)
 
-		self.logger.debug("{Project ID (-1 indicates unassigned): Number of clusters found in that project id}:\nsummary_dict = %s"%self.summary_dict)
-		if num_of_clusters_without_projID > 0:
-			self.logger.info("!!!! The following cluster surveys are not located within any project boundaries !!!!")
-			clus_tbl_dict_lst = common_functions.sqlite_2_dict(self.db_filepath, self.cluster_tbl_name) # this is cluster_survey table in a list of dictionary form
-			for i in uniq_id_of_clusters_without_projID:
-				clus_tbl_dict = [row for row in clus_tbl_dict_lst if row[self.unique_id_field] == i][0]
-				clus_num = clus_tbl_dict['ClusterNumber']
-				latlon = "%s, %s"%(clus_tbl_dict['latitude'], clus_tbl_dict['longitude'])
-				self.logger.info("!!!! Unique_id: %s, Cluster Num: %s, Lat Lon: %s !!!!"%(i, clus_num, latlon))
 
 
 	def populate_projID_fields(self):
@@ -296,19 +394,29 @@ class Determine_project_id:
 		self.initiate_connection()
 
 		for uniq_id, proj_id in self.uniq_id_to_proj_id.items():
-			geo_proj_id = '' if proj_id[0] == None else proj_id[0] # if proj_id is None, change it to ''. Otherwise, leave it as is.
-			final_proj_id = '' if proj_id[1] == None else proj_id[1]
+			silvsys = uniq_id[:2].upper()
+			geo_proj_id = '' if self.geo_calc_proj_id[uniq_id] == None else self.geo_calc_proj_id[uniq_id]
+			final_proj_id = '' if proj_id == None else proj_id
 
-			update_sql = "UPDATE %s SET %s = '%s', %s = '%s' WHERE %s = %s"%(self.cluster_tbl_name, self.geo_check_field, geo_proj_id, self.proj_id_field, final_proj_id, self.unique_id_field, uniq_id)
-			self.logger.debug(update_sql)
-			self.cur.execute(update_sql)
+			if silvsys == "CC":
+				# eg. UPDATE Clearcut_Survey_v2021 SET geo_proj_id = 'value', fin_proj_id = 'value' WHERE unique_id = 12
+				update_sql = "UPDATE %s SET %s = '%s', %s = '%s' WHERE %s = %s"%(self.clearcut_tbl_name, self.geo_check_field, 
+					geo_proj_id, self.fin_proj_id_field, final_proj_id, self.unique_id_field, uniq_id[2:])
+				self.logger.debug(update_sql)
+				self.cur.execute(update_sql)
+			else:
+				# eg. UPDATE Shelterwood_Survey_v2021 SET geo_proj_id = 'value', fin_proj_id = 'value' WHERE unique_id = 12
+				update_sql = "UPDATE %s SET %s = '%s', %s = '%s' WHERE %s = %s"%(self.shelterwood_tbl_name, self.geo_check_field, 
+					geo_proj_id, self.fin_proj_id_field, final_proj_id, self.unique_id_field, uniq_id[2:])
+				self.logger.debug(update_sql)
+				self.cur.execute(update_sql)				
 
 		self.close_connection()
 
 
 
 	def return_updated_variables(self):
-		return [self.tablenames_n_rec_count, self.uniq_id_to_proj_id, self.cluster_tbl_name, self.project_tbl_name, self.summary_dict]
+		return [self.tablenames_n_rec_count, self.uniq_id_to_proj_id, self.clearcut_tbl_name, self.shelterwood_tbl_name, self.summary_dict]
 
 
 
@@ -318,6 +426,8 @@ class Determine_project_id:
 		self.get_coord_from_sqlite()
 		self.get_prjId_override_values()
 		self.determine_project_id()
+		self.check_results()
+		self.check_silvsys()
 		self.summarize_results()
 		self.populate_projID_fields()
 
