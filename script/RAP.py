@@ -76,6 +76,8 @@ def RAP(configfilepath, initial_msg, custom_datapath = None, ignore_testdata = F
 		### At this point, you should have an output sqlite file with tables created, and
 		### the tables should have all the info of the input csv files (i.e. Clearcut_Survey_v2021, Shelterwood_Survey_v2021)
 
+
+
 		# shp2sqlite
 		# creating sqlite table from the shp file (project boundaries and info)
 		s2s = shp2sqlite.Shp2sqlite(cfg_dict, db_filepath, tablenames_n_rec_count, logger)
@@ -86,19 +88,23 @@ def RAP(configfilepath, initial_msg, custom_datapath = None, ignore_testdata = F
 		### At this point, you should have sqlite table named projects_shp with all the fields and values copied over from the input shpfile.
 
 
+
 		# determine_project_id
 		dp = determine_project_id.Determine_project_id(cfg_dict, db_filepath, tablenames_n_rec_count, logger)
 		dp.run_all()
 		# return some variables that may be used later on in the script
 		tablenames_n_rec_count, uniq_id_to_proj_id, clearcut_tbl_name, shelterwood_tbl_name, dp_summary_dict = dp.return_updated_variables()
 
+		### At this point, you have clearcut_survey, shelterwood_survey, and projects_shp tables in the sqlite database
+		### ...and have the geo_proj_id and fin_proj_id correctly filled out
 
 
-		# # analysis
-		# # Species and Site Occupancy analysis begins here:
-		# ana = analysis.Run_analysis(cfg_dict, db_filepath, clearcut_tbl_name, shelterwood_tbl_name, spc_to_check, spc_group_dict, logger)
-		# ana.run_all()
-		# # we will need the attribute names of cluster summary and proj summary tables:
+
+		# analysis
+		# Species comp and Site Occupancy analysis begins here:
+		ana = analysis.Run_analysis(cfg_dict, db_filepath, clearcut_tbl_name, shelterwood_tbl_name, spc_to_check, spc_group_dict, logger)
+		ana.run_all()
+		# we will need the attribute names of cluster summary and proj summary tables:
 		# clus_summary_attr = ana.clus_summary_attr # eg. {'c_clus_uid': 'cluster_uid', 'c_clus_num': 'cluster_number', 'c_proj_id': 'proj_id',...}
 		# proj_summary_attr = ana.proj_summary_attr
 
