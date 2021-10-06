@@ -19,7 +19,7 @@ class Run_analysis:
 		self.clus_summary_tblname = cfg_dict['SQLITE']['clus_summary_tblname']
 		self.proj_summary_tblname = cfg_dict['SQLITE']['proj_summary_tblname']
 		self.plot_summary_tblname = cfg_dict['SQLITE']['plot_summary_tblname']		
-		self.max_num_of_t_per_sqm = float(cfg_dict['CALC']['max_num_of_t_per_sqm']) # 0.5
+		self.max_num_of_t_per_sqm = float(cfg_dict['CALC']['max_num_of_t_per_sqm']) # 0.5 
 		# self.calc_max = int(cfg_dict['CALC']['num_of_trees_4_spcomp'])
 		self.num_of_plots = int(cfg_dict['CALC']['num_of_plots'])
 		self.clearcut_plot_area = 8 # sq m
@@ -101,7 +101,6 @@ class Run_analysis:
 		self.c_comments = 'cluster_comments' # eg {'P1':'some comments', 'P2':'more comments',...}
 		self.c_photos = 'photos' # photo url for each plot {'cluster':'www.photos/03','P1':'www.photos/01|www.photos/02', 'P2':'',...}
 		self.c_spc_comp = 'spc_comp' # number of trees for each species {BF': 1, 'LA': 1, 'SW': 8}
-		self.c_spc_comp_tree_count = 'spc_comp_tree_count' # number of trees used to generate spc_comp. similar to c_num_trees but only counts top x trees per plot. eg. 10
 		self.c_spc_comp_grp = 'spc_comp_grp' # number of trees for each species group {'BF': 1, 'LA': 1, 'SX': 8}
 		self.c_spc_comp_perc = 'spc_comp_perc' # same as c_spc_comp, but in percent. eg {'BF': 10.0, 'LA': 10.0, 'SW': 80.0}
 		self.c_spc_comp_grp_perc = 'spc_comp_grp_perc' # {'LA': 46.7, 'SX': 53.3}
@@ -192,6 +191,7 @@ class Run_analysis:
 			for cluster in cluster_in_dict:
 				# record dictionary will act as a template for this cluster and the values will be filled out as we go.
 				# for example, {'UnoccupiedPlot1': 'No', 'UnoccupiedreasonPlot1': '', 'Tree1SpeciesNamePlot1': 'Bf (fir, balsam)', 'Tree1HeightPlot1': '5', 'Tree2SpeciesNamePlot1': 'Sw (spruce, white)', 'Tree2HeightPlot1': '2', 'Tree3SpeciesNamePlot1': 'Sw (spruce, white)', 'Tree3HeightPlot1': '2'...}
+				self.logger.info("\n\tWorking on Proj[%s] Clus[%s]..."%(cluster[self.proj_id], cluster['ClusterNumber']))
 				record = self.clus_summary_dict.copy() # each record is one cluster in a dictionary form
 
 				record[self.c_clus_uid] = cluster[self.unique_id] # cluster unique id
@@ -203,18 +203,18 @@ class Run_analysis:
 				record[self.c_silvsys] = silvsys # 'CC' or 'SH'
 
 
-				c_site_occ_raw = {}
+				c_site_occ_raw = {} # {'P1':1, 'P2':0, ...} 1 if occupied, 0 if unoccupied
 				site_occ = self.num_of_plots  # eg. 8.  Starts with total number of plots and as we find unoccup plots, deduct 1.
-				site_occ_reason = {}  # this will end up being a list of all unoccup reasons eg. ['rock', 'rock', 'road'...]
+				site_occ_reason = {}  # this will end up being a list of all unoccup reasons eg. {'P1':'', 'P2': 'Road', ...}
 
 				# c_all_spc_raw = {} # num of spc for both 8m2 and 16m2. eg. {'P1':{'BW':2, 'SW':1}, 'P2':{'MR':1} ...} 
 				# c_all_spc = {} # all VALID species collected and height (for effective density calc). eg. {'P1':[['BF', 5.0], ['SW', 2.0], ['SW', 2.0]], 'P2':[['SW', 1.5]], ...}
-				c_num_trees = 0 # total number of VALID trees collected (for effective density calc) eg. 15.
-				c_eff_dens =0 # number of VALID trees per hectare. (total number of trees in a cluster*10000/(8plots * 8m2))
+				c_num_trees = 0 # total number of trees collected (for effective density calc) eg. 15.
+				c_eff_dens =0 # number of trees per hectare. (total number of trees in a cluster*10000/(8plots * 8m2))
 
 				# c_spc = [] # selected VALID tallestest trees for each plot will be appended to this list e.g. [[['Bf', 5.0], ['Sw', 2.0], ['Sw', 2.0]], [['La', 3.0]], [['Sw', 1.6], ['Sw', 1.9]],...]
 				c_spc_count = {} # eg. {'P1':[{'BW':2, 'SW':1}, {}], 'P2': None ...} 
-				invalid_spc_codes = []
+				invalid_spc_codes = [] 
 				comments_dict = {}
 				photos_dict = {'cluster':cluster['ClusterPhoto']} # eg. {'cluster':'www.photos/03','P1':'www.photos/01|www.photos/02', 'P2':'',...}
 
@@ -230,8 +230,8 @@ class Run_analysis:
 					photos_dict[plotname] = photos
 					c_site_occ_raw[plotname] = 1
 					site_occ_reason[plotname] = ''
-					c_all_spc_raw[plotname] = {}
-					c_all_spc[plotname] = []
+					# c_all_spc_raw[plotname] = {}
+					# c_all_spc[plotname] = []
 
 					# grab species
 					# if the plot is unoccupied, record it and move on.
@@ -241,221 +241,243 @@ class Run_analysis:
 						site_occ_reason[plotname] = (cluster['UnoccupiedreasonPlot'+plotnum])
 						c_spc_count[plotname] = None # eg. {'P2': None}
 
-					# if the plot is occupied then do the following: 
+					# if the plot is occupied then do the following:
+					# the goal is to populate c_spc_count # eg. {'P1':[{'BW':2, 'SW':1}, {}], 'P2': None ...} 
 					else:
 						if silvsys == 'CC':
 							# Species1SpeciesNamePlot1 ~ Species4SpeciesNamePlot8  # up to 4 species, 8 plots
 							# Species1NumberofTreesPlot1 ~ Species4NumberofTreesPlot8 # x number of trees per species
 							# loop through 1-4
+							spc_dict_8m2 = {} # eg. {'BW':2, 'SW':1}
+							spc_dict_16m2 = {} # only for sh
 							for spc_num in range(1,5):
-								pass
-						else:
+								spc_name = cluster['Species'+str(spc_num)+'SpeciesNamePlot'+plotnum] # eg. 'Bf (fir, balsam)' or ''
+								if len(spc_name) >= 2:
+									spc_name = spc_name + ' ' # some species codes are 3 letters, so this is necessary
+									spc_code = spc_name[:3].strip().upper()  # this turns 'Bf (fir, balsam)' into 'BF'
+									if spc_code not in self.spc_to_check:
+										self.logger.info("Invalid Species Name Found (and will not be counted): PrjID=%s, Clus=%s, SpeciesName=%s"%(cluster[self.proj_id], cluster['ClusterNumber'],spc_name))
+										invalid_spc_codes.append(spc_name)
+										continue # move on to the next species without running any of the scripts below within this for loop
+								else:
+									spc_code = None
+									continue # move on to the next species
+
+								# below will run only if we have a species code such as "Bf"
+								spc_count_raw = cluster['Species'+str(spc_num)+'NumberofTreesPlot'+plotnum] # eg. '2' or ''
+								if spc_count_raw in ['0', '', None]:
+									continue # move on to the next species
+								else:
+									spc_count = int(spc_count_raw)
+									c_num_trees += spc_count
+									if spc_code in spc_dict_8m2.keys():
+										spc_dict_8m2[spc_code] += spc_count
+									else:
+										spc_dict_8m2[spc_code] = spc_count # eg. {'BW':2}
+							# sum up
+							c_spc_count[plotname] = [spc_dict_8m2, spc_dict_16m2] # eg. {'P1':[{'BW':2, 'SW':1}, {}] }
+
+						elif silvsys == 'SH':
 							# Species1SpeciesNamePlot1 ~ Species6SpeciesNamePlot8  # species 1~3: 8m2 plot.  species 4~6: 16m2 plot
 							# Species1NumberofTreesPlot1 ~ Species6NumberofTreesPlot8 # x number of trees per species
 							# loop through 1-6
+							spc_dict_8m2 = {} # eg. {'BW':2, 'SW':1}
+							spc_dict_16m2 = {} # only for sh
 							for spc_num in range(1,7):
-								pass
+								spc_name = cluster['Species'+str(spc_num)+'SpeciesNamePlot'+plotnum] # eg. 'Bf (fir, balsam)' or ''
+								if len(spc_name) >= 2:
+									spc_name = spc_name + ' ' # some species codes are 3 letters, so this is necessary
+									spc_code = spc_name[:3].strip().upper()  # this turns 'Bf (fir, balsam)' into 'BF'
+									if spc_code not in self.spc_to_check:
+										self.logger.info("Invalid Species Name Found (and will not be counted): PrjID=%s, Clus=%s, SpeciesName=%s"%(cluster[self.proj_id], cluster['ClusterNumber'],spc_name))
+										invalid_spc_codes.append(spc_name)
+										continue # move on to the next species without running any of the scripts below within this for loop
+								else:
+									spc_code = None
+									continue # move on to the next species
+
+								# below will run only if we have a species code such as "Bf"
+								spc_count_raw = cluster['Species'+str(spc_num)+'NumberofTreesPlot'+plotnum] # eg. '2' or ''
+								if spc_count_raw in ['0', '', None]:
+									continue # move on to the next species
+								else:
+									spc_count = int(spc_count_raw)
+									c_num_trees += spc_count
+									# first 3 species are for 8m2
+									if spc_num in [1,2,3]:
+										if spc_code in spc_dict_8m2.keys():
+											spc_dict_8m2[spc_code] += spc_count
+										else:
+											spc_dict_8m2[spc_code] = spc_count # eg. {'BW':2}
+									# the next 3 species are for 16m2
+									elif spc_num in [4,5,6]:
+										if spc_code in spc_dict_16m2.keys():
+											spc_dict_16m2[spc_code] += spc_count
+										else:
+											spc_dict_16m2[spc_code] = spc_count # eg. {'BW':2}																
+							# sum up
+							c_spc_count[plotname] = [spc_dict_8m2, spc_dict_16m2] # eg. {'P1':[{'BW':2, 'SW':1}, {'BW':2}] }
+
+				self.logger.info("c_spc_count = %s"%(c_spc_count))
+				# eg. TIM-Gil01 201 c_spc_count = {'P1': [{'BF': 1}, {'PJ': 2}], 'P2': None, 'P3': [{'PT': 2, 'LA': 1, 'CE': 2}, {'PJ': 2, 'PW': 1}],
+				# 	'P4': [{'PR': 2, 'SB': 1}, {'PJ': 2}], 'P5': None, 'P6': [{'PW': 2, 'PR': 1}, {}], 'P7': [{}, {}], 'P8': [{'BF': 2}, {'PJ': 3}]}
+				self.logger.info("c_num_trees = %s"%(c_num_trees))
 
 
 
+				# Calculating effective density (ED)
+				# for clearcut sites, the survey area is 8m2
+				# for shelterwood sites, the survey area is both 8m2 and 16m2
+				# the ED is calculated for 8m2 and 16m2, then the numbers added together for final ED.
+				# for example, a cluster where 14 trees are found in 8m2, and 6 trees in 16m2,
+				# ED = '14trees'x 10000/('8m2'x'8plots') + '6trees'x 10000/('16m2'x'8plots') = 2187.5 + 468.75 = 2656.25
+				tree_count_8m2 = 0
+				tree_count_16m2 = 0
+				for plot_num, spc_info in c_spc_count.items():
+					if spc_info != None:
+						for spc8m2, count8m2 in spc_info[0].items():
+							tree_count_8m2 += count8m2
+						for spc16m2, count16m2 in spc_info[1].items():
+							tree_count_16m2 += count16m2
+				# number of trees for each cluster shouldn't exceed the limit
+				# if we consider upper limit of 0.5 tree per m2, 64x0.5= 32 max trees for CC, and 128x0.5=64 max trees for SH
+				tree_count_max_8m2 = 8*8*self.max_num_of_t_per_sqm
+				tree_count_max_16m2 = 16*8*self.max_num_of_t_per_sqm
+				if tree_count_8m2 > tree_count_max_8m2: tree_count_8m2 = tree_count_max_8m2
+				if tree_count_16m2 > tree_count_max_16m2: tree_count_16m2 = tree_count_max_16m2
+				# Calculate Effective Density
+				c_eff_dens = (tree_count_8m2*10000/(8*8)) + (tree_count_16m2*10000/(16*8))
+				self.logger.info("c_eff_dens = %s"%(c_eff_dens))
 
-
-
-
-
-
-
-
-
-
-
-						# # gather all trees and heights of plot X
-						# trees_in_plotx = []
-
-						# # loop through max number of sample trees (6)
-						# for j in range(self.sample_max):
-						# 	treenum = str(j+1)
-						# 	treeXspeciesname = cluster['Tree'+treenum+'SpeciesNamePlot'+plotnum]
-						# 	if len(treeXspeciesname) >= 2: 
-						# 		treeXspeciesname = treeXspeciesname + ' '
-						# 		treeXspeciesname = treeXspeciesname[:3].strip()  # this turns 'Bf (fir, balsam)' into 'Bf'
-						# 	# for height, if the value is a number in a string, change it to a float. If that can't be done, it will be -1.
-						# 	try:
-						# 		treeXheight = float(cluster['Tree'+treenum+'HeightPlot'+plotnum])
-						# 		if self.min_height <= treeXheight <= self.max_height:
-						# 			pass
-						# 		else:
-						# 			treeXheight = -1
-						# 	except:
-						# 		treeXheight = -1
-						# 	trees_in_plotx.append([treeXspeciesname,treeXheight])
-
-						# 	sp_code = treeXspeciesname.upper()
-						# 	if treeXheight > 0:
-						# 		c_all_spc[plotname].append([sp_code,treeXheight])
-						# 		if sp_code in c_all_spc_raw[plotname].keys():
-						# 			c_all_spc_raw[plotname][sp_code] += 1
-						# 		else:
-						# 			c_all_spc_raw[plotname][sp_code] = 1
-						# # at this point, trees_in_plotx = [['La', 1.0], ['La', 2.0], ['La', 0.8], ['Sw', 3.0], ['La', -1], ['', -1]]
-						# # at this point, c_all_spc_raw = {{'P1':{'LA':3, 'SW':1}, 'P2':{'MR':1}, ...}}
-
-						# # let's make a list of invalid species codes we found here for reporting purpose
-						# invalids = [i[0].upper() for i in trees_in_plotx if len(i[0])>0 and i[0].upper() not in self.spc_to_check]
-						# invalid_spc_codes.append(invalids)
-
-						# # throw away species that we don't use for calculation. Also throw away species with no height measured.
-						# trees_in_plotx = [[i[0].upper(),i[1]] for i in trees_in_plotx if len(i[0])>1 and i[0].upper() in self.spc_to_check and i[1] != -1]
-						# # at this point, trees_in_plotx = [['LA', 1.0], ['LA', 2.0], ['LA', 0.8], ['SW', 3.0]]
-
-						# # c_all_spc.append(trees_in_plotx) Delete this later!!
-						# c_num_trees += len(trees_in_plotx)
-
-						# # if we still have more than 2 (calc_max) trees, we gotta pick the tallest 2.
-						# if len(trees_in_plotx) > self.calc_max:
-						# 	tallest_selected = common_functions.select_tallest_x(trees_in_plotx, self.calc_max)
-						# else:
-						# 	tallest_selected = trees_in_plotx
-						# # at this point, tallest_selected = [['SW', 3.0], ['LA', 2.0]]
-						# c_spc.append(tallest_selected)
-
-				# calculate c_spc_count
-				for i in range(self.num_of_plots):
-					plotname = 'P' + str(i+1)
-					c_spc_count[plotname] = {}
-					plot_data = c_spc[i]
-					if len(plot_data) > 0:
-						for tree in plot_data:
-							treename = tree[0]
-							if treename in c_spc_count[plotname].keys():
-								c_spc_count[plotname][treename] += 1
-							else:
-								c_spc_count[plotname][treename] = 1
-
-				# calculating effective density
-				# first we need to find the plot area (should be 8m2 by default)
-				plot_area = self.default_plot_area
-
-				# the code block below has been commented out because the plot area is always the default 8m2 for now.
-				# for prj in self.prj_shp_in_dict:
-				# 	# find the matching project shapefile using the project id as the key
-				# 	if prj[self.prj_shp_prjid_fieldname] == cluster[self.proj_id]:
-				# 		custom_plot_area = prj[self.prj_shp_plotsize_fieldname]
-				# 		if custom_plot_area in ['4','8','16']: # the only option is 4, 8 and 16.
-				# 			self.logger.debug("using custom plot area: %s"%custom_plot_area)
-				# 			plot_area = int(custom_plot_area)
-
-				c_eff_dens = c_num_trees*10000/(self.num_of_plots*plot_area)
+				# Site Occupancy
+				site_occ = float(site_occ)/self.num_of_plots # this will give you the site occupancy value between 0 and 1. eg. site_occ = 0.875, 
 
 				# assemble the collected information to the record dictionary.
 				record[self.c_comments] = comments_dict # comments_dict looks like {'P1': 'some comments', 'P2': '',...}
 				record[self.c_photos] = photos_dict
 				record[self.c_site_occ_raw] = c_site_occ_raw
-				record[self.c_site_occ] = float(site_occ)/self.num_of_plots # this will give you the site occupancy value between 0 and 1. eg. site_occ = 0.875, 
-				record[self.c_site_occ_reason] = site_occ_reason # eg. ['Slash','Slash','Roads','Rocks']
-				record[self.c_all_spc_raw] = c_all_spc_raw # eg.{'P1': {'BF': 1, 'SW': 2}, 'P2': {'LA': 1}, 'P3': {'SW': 1}, 'P4': {'SW': 2}, 'P5': {'SW': 1}, 'P6': {'SW': 1}, 'P7': {'SW': 2}, 'P8': {}}
-				# record[self.c_all_spc] = c_all_spc # eg. [[['Bf', 5.0], ['Sw', 2.0], ['Sw', 2.0], ['Sw', 1.9]], [['La', 3.0]], ...]
-				# record[self.c_spc] = c_spc # eg. [[['BF', 5.0], ['SW', 2.0]], [['LA', 3.0]], [['SW', 1.5]], [['SW', 1.6], ['SW', 1.9]], [['SW', 1.6]], [['SW', 3.0]], [['SW', 2.0], ['SW', 1.5]], []]
-				record[self.c_spc_count] = c_spc_count # eg. {'P1': {'BF': 1, 'SW': 1}, 'P2': {'LA': 1}, 'P3': {'SW': 1}, 'P4': {'SW': 2}, 'P5': {'SW': 1}, 'P6': {'SW': 1}, 'P7': {'SW': 2}, 'P8': {}}
+				record[self.c_site_occ] = site_occ
+				record[self.c_site_occ_reason] = site_occ_reason # eg. {'P1':'', 'P2': 'Road', ...}
+				record[self.c_spc_count] = c_spc_count # eg. {'P1': [{'BF': 1}, {'PJ': 2}], 'P2': None, ...}
 				record[self.c_num_trees] = c_num_trees # eg. 15
 				record[self.c_eff_dens] = c_eff_dens
 				record[self.c_invalid_spc_code] = invalid_spc_codes # eg. [[],['XY'],[],[],...]
 
+				self.logger.info("Site Occ = %s"%site_occ)
+				self.logger.info("photos_dict = %s"%photos_dict)
+
 
 				# we've gathered all the information we need from the cluster_survey table, but we need to summarize them.
-				# remember that c_spc is a list of tallest trees with valid species codes.
-				# summarizing c_spc into the following formats:
-				spc_comp = {spc:[0,0] for spc in self.spc_to_check}  # {spcname:[count,avgheight]}
-				spc_comp_grp = {spcgrp:[0,0] for spcgrp in self.spc_group_dict.keys()} # {spcgrpname:[count,avgheight]}
+				# summarizing c_spc_count into the following formats:
+				spc_comp = {spc:0 for spc in self.spc_to_check}  # {spcname:count} eg. {'PB': 0, 'PT': 0, 'PO': 0 ...}
+				spc_comp_grp = {spcgrp:0 for spcgrp in self.spc_group_dict.keys()} # {spcgrpname:count} eg. {'PO': 0,...}
 				spc_comp_tree_count = 0 
 
-				# loop through c_spc
-				for plot in c_spc:
-					for tree in plot:
-						spc_comp_tree_count += 1
-						spc_name = tree[0]
-						ht = tree[1]
-						spc_comp[spc_name][0] += 1
-						spc_comp[spc_name][1] += ht
-						for grp, spcs in self.spc_group_dict.items():
-							if spc_name in spcs:
-								spc_comp_grp[grp][0] += 1
-								spc_comp_grp[grp][1] += ht
+				# loop through c_spc_count
+				for plot_name, spc_info in c_spc_count.items():
+					if spc_info != None:
+						# spc_info is a list with two dictionaries: eg. [{'PT': 2, 'LA': 1, 'CE': 2}, {'PJ': 2, 'PW': 1}]
+						for spc_count in spc_info:
+							for spc_name, count in spc_count.items(): # eg. spc_name = 'PT' and count = 2
+								spc_comp[spc_name] += count
+								spc_comp_tree_count += count
+								# populate the spc_comp_grp
+								for grp, spcs_lst in self.spc_group_dict.items():
+									if spc_name in spcs_lst:
+										spc_comp_grp[grp] += count
+										break # no need to loop through the rest of the spc_group_dict
 
-				# height is sum at this point. need to convert it to avg
-				# also throwing out species with count = 0
-				spc_comp = {k:([v[0],round(float(v[1])/v[0],2)]) for k,v in spc_comp.items() if v[0] > 0}
-				spc_comp_grp = {k:([v[0],round(float(v[1])/v[0],2)]) for k,v in spc_comp_grp.items() if v[0] > 0}
-				# spc_comp looks like {'BF': [1, 5.0], 'BW': [0, -1], 'CE': [0, -1], 'LA': [1, 3.0], 'PO': [0, -1], 'PT': [0, -1], 'SB': [0, -1], 'SW': [9, 1.9]}
-				# spc_comp_grp looks like {'BF': [1, 5.0], 'BW': [0, -1], 'CE': [0, -1], 'LA': [1, 3.0], 'PO': [0, -1], 'PT': [0, -1], 'SX': [9, 1.9]}
+				# spc_comp_tree_count should match c_num_trees we derived above. double checking it here
+				if spc_comp_tree_count != c_num_trees:
+					self.logger.info("!!!! ProjID: %s clus %s. Total number of trees error: spc_comp_tree_count=%s, c_num_trees = %s"%(cluster[self.proj_id], 
+						cluster['ClusterNumber'], spc_comp_tree_count, c_num_trees))
+
+				# throw out species where its count = 0
+				spc_comp = {k:v for k,v in spc_comp.items() if v > 0} # eg. {'PB': 2, 'PT': 1, 'PO': 3 ...}
+				spc_comp_grp = {k:v for k,v in spc_comp_grp.items() if v > 0} # eg. {'PO': 6,...}
+
+				# calculate percentage
+				spc_comp_perc = {k:round(float(v)*100/spc_comp_tree_count,1) for k,v in spc_comp.items()}
+				spc_comp_grp_perc = {k:round(float(v)*100/spc_comp_tree_count,1) for k,v in spc_comp_grp.items()}
+
+				self.logger.info("spc_comp: %s"%spc_comp) # eg. {'BW': 2, 'PB': 1, 'PT': 13}
+				self.logger.info("spc_comp_grp: %s"%spc_comp_grp) # eg.{'BW': 2, 'PO': 14}
+				self.logger.info("spc_comp_perc: %s"%spc_comp_perc) # eg. {'BW': 12.5, 'PB': 6.2, 'PT': 81.2}
+				self.logger.info("spc_comp_grp_perc: %s"%spc_comp_grp_perc) # eg. {'BW': 12.5, 'PO': 87.5}
 
 
-				spc_comp_perc = {k:(round(float(v[0])*100/spc_comp_tree_count,1) if spc_comp_tree_count!=0 else 0) for k,v in spc_comp.items()}
-				spc_comp_grp_perc = {k:(round(float(v[0])*100/spc_comp_tree_count,1) if spc_comp_tree_count!=0 else 0) for k,v in spc_comp_grp.items()}
-				# 'spc_comp_perc' looks like {'BF': 9.1, 'BW': 0.0, 'CE': 0.0, 'LA': 9.1, 'PO': 0.0, 'PT': 0.0, 'SB': 0.0, 'SW': 81.8}, 
-				# 'spc_comp_grp_perc' looks like {'BF': 9.1, 'BW': 0.0, 'CE': 0.0, 'LA': 9.1, 'PO': 0.0, 'PT': 0.0, 'SX': 81.8}, 
-
-				# assemble the collected information to the record dictionary.
-				record[self.c_spc_comp] = spc_comp
-				record[self.c_spc_comp_grp] = spc_comp_grp
-				record[self.c_spc_comp_tree_count] = spc_comp_tree_count  # number of trees counted for spcies comp.
-				record[self.c_spc_comp_perc] = spc_comp_perc
-				record[self.c_spc_comp_grp_perc] = spc_comp_grp_perc
 
 
-				# adding residual (overstory) and ecosite information now
-				attr_lst = cluster.keys()	
 
-				# residual:
-				residual = {}  # eg. {'BW': 0, 'PJ': 0, ....}
-				if cluster['Anyresidualoverstorytreesnearby'] == 'Yes':
-					# find residual attributes names such as "Species1SpeciesNameResiduals" and "Species1NumberofTreesResiduals"
-					spc_attrs = []
-					num_attrs = []
-					for attr in attr_lst:
-						if attr.upper().endswith('SPECIESNAMERESIDUALS'):
-							spc_attrs.append(attr)
-						elif attr.upper().endswith('NUMBEROFTREESRESIDUALS'):
-							num_attrs.append(attr)
-					# assuming len(spc_attrs) == len(num_attrs), cause they really should be
-					for i in range(len(spc_attrs)):
-						spc_fullname = cluster[spc_attrs[i]] # eg. 'Bf (fir, balsam)'
-						spc_num = cluster[num_attrs[i]] # eg. '3'
+				# # assemble the collected information to the record dictionary.
+				# record[self.c_spc_comp] = spc_comp
+				# record[self.c_spc_comp_grp] = spc_comp_grp
+				# record[self.c_spc_comp_perc] = spc_comp_perc
+				# record[self.c_spc_comp_grp_perc] = spc_comp_grp_perc
 
-						if len(spc_fullname) >= 2:
-							spc_fullname = spc_fullname + ' ' # adding extra space here in case the of 3 character species code.
-							spc_name = spc_fullname[:3].strip().upper() # eg. spc_name = 'Bf'
-						else:
-							continue # move on if no species code found.
+
+				# # # adding residual (overstory) and ecosite information now
+				# attr_lst = cluster.keys()	
+
+				# # residual:
+				# residual = {}  # eg. {'BW': 0, 'PJ': 0, ....}
+				# if cluster['Anyresidualoverstorytreesnearby'] == 'Yes':
+				# 	# find residual attributes names such as "Species1SpeciesNameResiduals" and "Species1NumberofTreesResiduals"
+				# 	spc_attrs = []
+				# 	num_attrs = []
+				# 	for attr in attr_lst:
+				# 		if attr.upper().endswith('SPECIESNAMERESIDUALS'):
+				# 			spc_attrs.append(attr)
+				# 		elif attr.upper().endswith('NUMBEROFTREESRESIDUALS'):
+				# 			num_attrs.append(attr)
+				# 	# assuming len(spc_attrs) == len(num_attrs), cause they really should be
+				# 	for i in range(len(spc_attrs)):
+				# 		spc_fullname = cluster[spc_attrs[i]] # eg. 'Bf (fir, balsam)'
+				# 		spc_num = cluster[num_attrs[i]] # eg. '3'
+
+				# 		if len(spc_fullname) >= 2:
+				# 			spc_fullname = spc_fullname + ' ' # adding extra space here in case the of 3 character species code.
+				# 			spc_name = spc_fullname[:3].strip().upper() # eg. spc_name = 'Bf'
+				# 		else:
+				# 			continue # move on if no species code found.
 						
-						try:
-							spc_num = int(spc_num)
-							if spc_num < 1: continue
-						except ValueError:
-							continue
+				# 		try:
+				# 			spc_num = int(spc_num)
+				# 			if spc_num < 1: continue
+				# 		except ValueError:
+				# 			continue
 
-						# once we have a valid species code and a valid species number, enter it to the residual dictionary.
-						try:
-							residual[spc_name] += spc_num
-						except KeyError:
-							residual[spc_name] = spc_num
+				# 		# once we have a valid species code and a valid species number, enter it to the residual dictionary.
+				# 		try:
+				# 			residual[spc_name] += spc_num
+				# 		except KeyError:
+				# 			residual[spc_name] = spc_num
 
-				# ecosite values:
-				ecosite = cluster['MoistureEcosite'] # moisture and nutrient eg. 'wet'
-				eco_nutri = cluster['NutrientEcosite01']
-				eco_comment = cluster['CommentsEcosite'].replace("'","") # eg. 'this is a landing site'
+				# # ecosite values:
+				# ecosite = cluster['MoistureEcosite'] # moisture and nutrient eg. 'wet'
+				# eco_nutri = cluster['NutrientEcosite01']
+				# eco_comment = cluster['CommentsEcosite'].replace("'","") # eg. 'this is a landing site'
 
-				record[self.c_residual] = residual
-				record[self.c_ecosite] = ecosite
-				record[self.c_eco_comment] = eco_comment
-				record[self.c_eco_nutri] = eco_nutri
+				# record[self.c_residual] = residual
+				# record[self.c_ecosite] = ecosite
+				# record[self.c_eco_comment] = eco_comment
+				# record[self.c_eco_nutri] = eco_nutri
 
-				# all these records components are assembled and appended as a new record in the cluster summary table.
-				self.clus_summary_dict_lst.append(record)
+				# # all these records components are assembled and appended as a new record in the cluster summary table.
+				# self.clus_summary_dict_lst.append(record)
 		
 
 
-
+	def photo_alternate_paths(self):
+		""" 
+		first, rename photos
+		second, 3 paths for photos: 
+			original = '...images/connectspatial/25aa1a61-367f-4ffa-bda5-e3535df729f4.jpg'
+			local sync location = r'C:\Users\kimdan\Government of Ontario\Regeneration Assessment Program - RAP Picture Library\Michaud130_C192_P4.jpg'
+			sharepoint = 'https://ontariogov.sharepoint.com/:i:/r/sites/MNRF-ROD-EXT/RAP/RAP%20Picture%20Library/Michaud130_C192_P4.jpg'
+		third, (may be do this in another script?) copy the photos to the local sync location (if the picture is not already there)
+		"""
+		pass
 
 
 

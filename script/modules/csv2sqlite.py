@@ -32,6 +32,7 @@ class Csv2sqlite:
 		self.generate_db_name()
 		self.getcsvfilelist()
 		self.csv_to_sqlite()
+		self.fix_misspelled_fieldnames() # unnecessary to run this if all fieldnames are correct
 
 		self.logger.debug('db_fullpath_new = %s'%self.db_fullpath_new)
 		self.logger.debug('tablenames_n_rec_count = \n%s'%self.tablenames_n_rec_count)
@@ -183,6 +184,18 @@ class Csv2sqlite:
 			con.close()
 			csvfile.close()
 
+
+	def fix_misspelled_fieldnames(self):
+		"""
+		This method is very specific to the mistakes I made on the Terraflex form.
+		Clearcut_Survey_v2021 table has a field called PhotosPot6 which is misspelled (corr: PhotosPlot6)
+		"""
+		con = sqlite3.connect(self.db_fullpath_new)
+		cur = con.cursor()			
+		alter_sql = """ALTER TABLE Clearcut_Survey_v2021 RENAME COLUMN PhotosPot6 to PhotosPlot6;"""
+		cur.execute(alter_sql)
+		con.commit()
+		con.close()			
 
 
 # testing
