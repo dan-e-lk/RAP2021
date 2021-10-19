@@ -40,7 +40,8 @@ def unpack_cfg(cfg_file):
 
 def cfg_to_dict(cfg_file):
 	import configparser
-	parser = configparser.ConfigParser()
+	# parser = configparser.ConfigParser() # this can't take '%' value in strings
+	parser = configparser.RawConfigParser()
 	parser.read(cfg_file)
 
 	cfg_dict = {section: dict(parser.items(section)) for section in parser.sections()}

@@ -23,7 +23,9 @@ class logger():
         self.debug_msg = ''
         self.info_msg = ''
 
-        formatter = logging.Formatter(fmt='%(asctime)s %(message)s',datefmt='%m/%d/%Y %I:%M:%S %p')
+        # formatter = logging.Formatter(fmt='%(asctime)s %(message)s',datefmt='%m/%d/%Y %I:%M:%S %p')
+        # formatter = logging.Formatter(fmt='%(asctime)s %(message)s',datefmt='%H:%M:%S')
+        formatter = logging.Formatter(fmt='%(message)s',datefmt='%H:%M:%S')
 
         self.logger = logging.getLogger(logFile)
         if (debug): self.logger.setLevel(logging.DEBUG)

@@ -1,7 +1,7 @@
 # this module gathers and analysis whatever data we have so far 
 # and outputs plot_summary, cluster_summary, and project_summary tables in the sqlite database.
 
-import os, csv, sqlite3
+import os, csv, sqlite3, shutil
 
 # importing custom modules
 if __name__ == '__main__':
@@ -14,6 +14,7 @@ else:
 class Run_analysis:
 	def __init__(self, cfg_dict, db_filepath, clearcut_tbl_name, shelterwood_tbl_name, spc_to_check, spc_group_dict, logger):
 		# input variables
+		self.cfg_dict = cfg_dict
 		self.proj_id = cfg_dict['SQLITE']['fin_proj_id'] # this project id attribute now exists in Cluster_Survey table.
 		self.unique_id = cfg_dict['SQLITE']['unique_id_fieldname']
 		self.clus_summary_tblname = cfg_dict['SQLITE']['clus_summary_tblname']
@@ -110,6 +111,9 @@ class Run_analysis:
 		self.c_eco_comment = 'ecosite_comment' # eg. 'this is a landing site'
 		self.c_lat = 'lat' # DO NOT CHANGE THIS!!!
 		self.c_lon = 'lon' # DO NOT CHANGE THIS!!!
+
+		self.c_local_sync_photopath = 'local_sync_photopath' # new photo path. C drive, but sync'ed to sharepoint. eg {'cluster':['C:/Users/kimdan/Government of Ontario/Regeneration Assessment Program - RAP Picture Library/03.jpg','C:/Users/kimdan/Government of Ontario/Regeneration Assessment Program - RAP Picture Library/04.jpg'],'P1':[], 'P2':[],...}
+		self.c_sharepoint_photopath = 'sharepoint_photopath' # final photo path (same format as above)
 
 
 		# attributes of project_summary table
@@ -230,8 +234,7 @@ class Run_analysis:
 					photos_dict[plotname] = photos
 					c_site_occ_raw[plotname] = 1
 					site_occ_reason[plotname] = ''
-					# c_all_spc_raw[plotname] = {}
-					# c_all_spc[plotname] = []
+					p_num_trees = 0 # total number of trees collected for each plot
 
 					# grab species
 					# if the plot is unoccupied, record it and move on.
@@ -270,6 +273,7 @@ class Run_analysis:
 								else:
 									spc_count = int(spc_count_raw)
 									c_num_trees += spc_count
+									p_num_trees += spc_count
 									if spc_code in spc_dict_8m2.keys():
 										spc_dict_8m2[spc_code] += spc_count
 									else:
@@ -289,7 +293,7 @@ class Run_analysis:
 									spc_name = spc_name + ' ' # some species codes are 3 letters, so this is necessary
 									spc_code = spc_name[:3].strip().upper()  # this turns 'Bf (fir, balsam)' into 'BF'
 									if spc_code not in self.spc_to_check:
-										self.logger.info("Invalid Species Name Found (and will not be counted): PrjID=%s, Clus=%s, SpeciesName=%s"%(cluster[self.proj_id], cluster['ClusterNumber'],spc_name))
+										self.logger.info("!!!! Invalid Species Name Found (and will not be counted): PrjID=%s, Clus=%s, SpeciesName=%s"%(cluster[self.proj_id], cluster['ClusterNumber'],spc_name))
 										invalid_spc_codes.append(spc_name)
 										continue # move on to the next species without running any of the scripts below within this for loop
 								else:
@@ -303,6 +307,7 @@ class Run_analysis:
 								else:
 									spc_count = int(spc_count_raw)
 									c_num_trees += spc_count
+									p_num_trees += spc_count
 									# first 3 species are for 8m2
 									if spc_num in [1,2,3]:
 										if spc_code in spc_dict_8m2.keys():
@@ -317,11 +322,20 @@ class Run_analysis:
 											spc_dict_16m2[spc_code] = spc_count # eg. {'BW':2}																
 							# sum up
 							c_spc_count[plotname] = [spc_dict_8m2, spc_dict_16m2] # eg. {'P1':[{'BW':2, 'SW':1}, {'BW':2}] }
+						
+						# if the total tree count of this plot is still zero, this site is unoccupied.
+						# this can happen if Unoccupied = No, but the number of total trees in the plot is zero.
+						if p_num_trees == 0: 
+							site_occ -= 1
+							c_site_occ_raw[plotname] = 0
+							site_occ_reason[plotname] = 'Unspecified'
+							c_spc_count[plotname] = None
 
-				self.logger.info("c_spc_count = %s"%(c_spc_count))
+
+				self.logger.debug("c_spc_count = %s"%(c_spc_count))
 				# eg. TIM-Gil01 201 c_spc_count = {'P1': [{'BF': 1}, {'PJ': 2}], 'P2': None, 'P3': [{'PT': 2, 'LA': 1, 'CE': 2}, {'PJ': 2, 'PW': 1}],
 				# 	'P4': [{'PR': 2, 'SB': 1}, {'PJ': 2}], 'P5': None, 'P6': [{'PW': 2, 'PR': 1}, {}], 'P7': [{}, {}], 'P8': [{'BF': 2}, {'PJ': 3}]}
-				self.logger.info("c_num_trees = %s"%(c_num_trees))
+				self.logger.debug("c_num_trees = %s"%(c_num_trees))
 
 
 
@@ -347,7 +361,7 @@ class Run_analysis:
 				if tree_count_16m2 > tree_count_max_16m2: tree_count_16m2 = tree_count_max_16m2
 				# Calculate Effective Density
 				c_eff_dens = (tree_count_8m2*10000/(8*8)) + (tree_count_16m2*10000/(16*8))
-				self.logger.info("c_eff_dens = %s"%(c_eff_dens))
+				self.logger.debug("c_eff_dens = %s"%(c_eff_dens))
 
 				# Site Occupancy
 				site_occ = float(site_occ)/self.num_of_plots # this will give you the site occupancy value between 0 and 1. eg. site_occ = 0.875, 
@@ -363,8 +377,8 @@ class Run_analysis:
 				record[self.c_eff_dens] = c_eff_dens
 				record[self.c_invalid_spc_code] = invalid_spc_codes # eg. [[],['XY'],[],[],...]
 
-				self.logger.info("Site Occ = %s"%site_occ)
-				self.logger.info("photos_dict = %s"%photos_dict)
+				self.logger.debug("Site Occ = %s"%site_occ)
+				self.logger.debug("photos_dict = %s"%photos_dict)
 
 
 				# we've gathered all the information we need from the cluster_survey table, but we need to summarize them.
@@ -400,101 +414,138 @@ class Run_analysis:
 				spc_comp_perc = {k:round(float(v)*100/spc_comp_tree_count,1) for k,v in spc_comp.items()}
 				spc_comp_grp_perc = {k:round(float(v)*100/spc_comp_tree_count,1) for k,v in spc_comp_grp.items()}
 
-				self.logger.info("spc_comp: %s"%spc_comp) # eg. {'BW': 2, 'PB': 1, 'PT': 13}
-				self.logger.info("spc_comp_grp: %s"%spc_comp_grp) # eg.{'BW': 2, 'PO': 14}
-				self.logger.info("spc_comp_perc: %s"%spc_comp_perc) # eg. {'BW': 12.5, 'PB': 6.2, 'PT': 81.2}
-				self.logger.info("spc_comp_grp_perc: %s"%spc_comp_grp_perc) # eg. {'BW': 12.5, 'PO': 87.5}
+				self.logger.debug("spc_comp: %s"%spc_comp) # eg. {'BW': 2, 'PB': 1, 'PT': 13}
+				self.logger.debug("spc_comp_grp: %s"%spc_comp_grp) # eg.{'BW': 2, 'PO': 14}
+				self.logger.debug("spc_comp_perc: %s"%spc_comp_perc) # eg. {'BW': 12.5, 'PB': 6.2, 'PT': 81.2}
+				self.logger.debug("spc_comp_grp_perc: %s"%spc_comp_grp_perc) # eg. {'BW': 12.5, 'PO': 87.5}
+
+				# assemble the collected information to the record dictionary.
+				record[self.c_spc_comp] = spc_comp
+				record[self.c_spc_comp_grp] = spc_comp_grp
+				record[self.c_spc_comp_perc] = spc_comp_perc
+				record[self.c_spc_comp_grp_perc] = spc_comp_grp_perc
 
 
+				# ecosite values:
+				ecosite = cluster['MoistureEcosite'] # moisture and nutrient eg. 'wet'
+				eco_nutri = cluster['NutrientEcosite01'] # eg. Poor, Very Poor, Rich...
+				eco_comment = cluster['CommentsEcosite'].replace("'","") # eg. 'this is a landing site'
+
+				self.logger.debug("c_ecosite: %s"%ecosite)
+				self.logger.debug("c_eco_comment: %s"%eco_comment)
+				self.logger.debug("c_eco_nutri: %s"%eco_nutri)
+
+				record[self.c_ecosite] = ecosite
+				record[self.c_eco_comment] = eco_comment
+				record[self.c_eco_nutri] = eco_nutri
 
 
+				# all these records components are assembled and appended as a new record in the cluster summary table.
+				# self.logger.info("cluster summary: %s"%record)
+				self.clus_summary_dict_lst.append(record)
 
-				# # assemble the collected information to the record dictionary.
-				# record[self.c_spc_comp] = spc_comp
-				# record[self.c_spc_comp_grp] = spc_comp_grp
-				# record[self.c_spc_comp_perc] = spc_comp_perc
-				# record[self.c_spc_comp_grp_perc] = spc_comp_grp_perc
-
-
-				# # # adding residual (overstory) and ecosite information now
-				# attr_lst = cluster.keys()	
-
-				# # residual:
-				# residual = {}  # eg. {'BW': 0, 'PJ': 0, ....}
-				# if cluster['Anyresidualoverstorytreesnearby'] == 'Yes':
-				# 	# find residual attributes names such as "Species1SpeciesNameResiduals" and "Species1NumberofTreesResiduals"
-				# 	spc_attrs = []
-				# 	num_attrs = []
-				# 	for attr in attr_lst:
-				# 		if attr.upper().endswith('SPECIESNAMERESIDUALS'):
-				# 			spc_attrs.append(attr)
-				# 		elif attr.upper().endswith('NUMBEROFTREESRESIDUALS'):
-				# 			num_attrs.append(attr)
-				# 	# assuming len(spc_attrs) == len(num_attrs), cause they really should be
-				# 	for i in range(len(spc_attrs)):
-				# 		spc_fullname = cluster[spc_attrs[i]] # eg. 'Bf (fir, balsam)'
-				# 		spc_num = cluster[num_attrs[i]] # eg. '3'
-
-				# 		if len(spc_fullname) >= 2:
-				# 			spc_fullname = spc_fullname + ' ' # adding extra space here in case the of 3 character species code.
-				# 			spc_name = spc_fullname[:3].strip().upper() # eg. spc_name = 'Bf'
-				# 		else:
-				# 			continue # move on if no species code found.
-						
-				# 		try:
-				# 			spc_num = int(spc_num)
-				# 			if spc_num < 1: continue
-				# 		except ValueError:
-				# 			continue
-
-				# 		# once we have a valid species code and a valid species number, enter it to the residual dictionary.
-				# 		try:
-				# 			residual[spc_name] += spc_num
-				# 		except KeyError:
-				# 			residual[spc_name] = spc_num
-
-				# # ecosite values:
-				# ecosite = cluster['MoistureEcosite'] # moisture and nutrient eg. 'wet'
-				# eco_nutri = cluster['NutrientEcosite01']
-				# eco_comment = cluster['CommentsEcosite'].replace("'","") # eg. 'this is a landing site'
-
-				# record[self.c_residual] = residual
-				# record[self.c_ecosite] = ecosite
-				# record[self.c_eco_comment] = eco_comment
-				# record[self.c_eco_nutri] = eco_nutri
-
-				# # all these records components are assembled and appended as a new record in the cluster summary table.
-				# self.clus_summary_dict_lst.append(record)
-		
+# example cluster summary: {'cluster_uid': 398, 'cluster_number': '21', 'proj_id': 'WAW-NAG-395', 'creation_date': '2021-10-15', 
+# 'silvsys': 'CC', 'spc_count': {'P1': [{'SB': 1}, {}], 'P2': [{'SB': 2}, {}], 'P3': None, 'P4': [{'SB': 1}, {}], 'P5': [{'SB': 1}, {}], 'P6': [{'SB': 2}, {}], 'P7': None, 'P8': [{'BF': 1}, {}]}, 
+# 'total_num_trees': 8, 'effective_density': 1250.0, 'invalid_spc_codes': [], 'site_occ_data': {'P1': 1, 'P2': 1, 'P3': 0, 'P4': 1, 'P5': 1, 'P6': 1, 'P7': 0, 'P8': 1}, 'site_occ': 0.75, 
+# 'site_occ_reason': {'P1': '', 'P2': '', 'P3': 'Treed', 'P4': '', 'P5': '', 'P6': '', 'P7': 'Treed', 'P8': ''}, 'cluster_comments': {'P1': '', 'P2': '', 'P3': 'Pj over 10cm', 'P4': '', 'P5': '', 'P6': '', 'P7': '', 'P8': ''}, 
+# 'photos': {'cluster': 'images/connectspatial/795c9edd-d4db-4c46-bb8c-6a9d99d06050.jpg', 'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '', 'P6': '', 'P7': '', 'P8': ''}, 'spc_comp': {'BF': 1, 'SB': 7}, 
+# 'spc_comp_grp': {'BF': 1, 'SX': 7}, 'spc_comp_perc': {'BF': 12.5, 'SB': 87.5}, 'spc_comp_grp_perc': {'BF': 12.5, 'SX': 87.5}, 'ecosite_moisture': 'fresh', 'ecosite_nutrient': 'Unknown', 
+# 'ecosite_comment': '', 'lat': '48.78838752', 'lon': '-84.58135279'}
 
 
 	def photo_alternate_paths(self):
 		""" 
 		first, rename photos
 		second, 3 paths for photos: 
-			original = '...images/connectspatial/25aa1a61-367f-4ffa-bda5-e3535df729f4.jpg'
-			local sync location = r'C:\Users\kimdan\Government of Ontario\Regeneration Assessment Program - RAP Picture Library\Michaud130_C192_P4.jpg'
+			original = 'images/connectspatial/25aa1a61-367f-4ffa-bda5-e3535df729f4.jpg'
+			local sync location = 'C:/Users/kimdan/Government of Ontario/Regeneration Assessment Program - RAP Picture Library/Michaud130_C192_P4.jpg'
 			sharepoint = 'https://ontariogov.sharepoint.com/:i:/r/sites/MNRF-ROD-EXT/RAP/RAP%20Picture%20Library/Michaud130_C192_P4.jpg'
-		third, (may be do this in another script?) copy the photos to the local sync location (if the picture is not already there)
+		third, copy the photos to the local sync location (if the picture is not already there)
 		"""
-		pass
+		self.logger.info("Running photo_alternate_paths method")
+		# we will ultimately alter the self.clus_summary_dict_lst. first, we make a copy of it to loop it and change it as we go.
+		temp_clus_summary_dict_lst = self.clus_summary_dict_lst.copy()
 
+		# duplicate catching list
+		filename_lst = []
+		
+		# loop through the cluster summary records (each record is a dictionary)
+		for index, record in enumerate(temp_clus_summary_dict_lst):
+			# these two dictionaries will be filled out and added to the clus_summary_dict_lst's record
+			c_local_sync_photopath = {}
+			c_sharepoint_photopath = {}
+			# loop through the photo dictionary i.e. record['photos']			
+			for location_taken, url_txt in record[self.c_photos].items():
+				# location_taken can be 'cluster' or 'P1'...'P8'
+				# url can be 'images/connectspatial/25aa1a61-367f-4ffk.jpg|images/connectspatial/25aa1a61-367f-4ffa.jpg'
+				
+				c_local_sync_photopath[location_taken] = []
+				c_sharepoint_photopath[location_taken] = []	
 
+				# split the url in case there's more than one urls
+				urls = url_txt.split('|') # eg. ['images/connectspatial/25aa1a61-367f-4ffk.jpg', 'images/connectspatial/25aa1a61-367f-4ffa.jpg']
+				if urls != ['']: # if there's at least one url
+					for num, url in enumerate(urls):
+						# get the original full-path of the photo
+						original_fullpath = os.path.join(self.cfg_dict['INPUT']['inputdatafolderpath'], url) # eg. C:\RAP_2021\data\Regeneration Assessment Program_18-Oct-21_04-55\data\images\connectspatial\25aa1a61-367f-4ffa.jpg
+						filename = os.path.split(original_fullpath)[1] #eg. '25aa1a61-367f-4ffk.jpg'
+						last4letters = filename[-8:-4] #eg. '4ffk' - only to be used if there are duplicates
 
+						# Rename the photo files
+						# proj_id + C + cluster_number + photo_location + number if needed + creation date
+						# For example,
+						# WAW-NAG-395_C28_cluster_2021-10-15.jpg
+						# SAU-NSF-4_C16_P1_1_2021-10-15.jpg  if there's more than one photo for that location
+						new_filename = "%s_C%s_%s"%(record[self.c_proj_id], record[self.c_clus_num], location_taken) # SAU-NSF-4_C16_P1
+						if num > 0:
+							new_filename += '_%s'%num # _1
+						if new_filename in filename_lst:
+							new_filename += last4letters # this is in case there are duplicate cluster numbers.
+						filename_lst.append(new_filename)
+						new_filename += "_%s"%record[self.c_creation_date] # _2021-10-15
+						new_filename += filename[-4:] # .jpg
 
+						new_local_fullpath = os.path.join(self.cfg_dict['OUTPUT']['output_photopath'], new_filename) # eg. 'C:/Users/kimdan/Government of Ontario/Regeneration Assessment Program - RAP Picture Library/SAU-NSF-4_C16_P1_2021-10-15.jpg'
+						new_sharepoint_fullpath = self.cfg_dict['OUTPUT']['sharepoint_photopath'] + '/' + new_filename # eg. 'https://ontariogov.sharepoint.com/:i:/r/sites/MNRF-ROD-EXT/RAP/RAP%20Picture%20Library/SAU-NSF-4_C16_P1_2021-10-15.jpg'
+						
+						# time to copy over!!
+						if not os.path.exists(new_local_fullpath):
+							self.logger.info("Copying photo: %s"%new_filename)
+							print("Copying photo: %s"%new_filename)
+							shutil.copy2(original_fullpath, new_local_fullpath)
 
+						# write the new paths down to the summary dictionary
+						c_local_sync_photopath[location_taken].append(new_local_fullpath) 
+						c_sharepoint_photopath[location_taken].append(new_sharepoint_fullpath) 
 
+			self.clus_summary_dict_lst[index][self.c_local_sync_photopath] = c_local_sync_photopath
+			self.clus_summary_dict_lst[index][self.c_sharepoint_photopath] = c_sharepoint_photopath
 
+		# for i in range(len(self.clus_summary_dict_lst)):
+		# 	self.logger.info(str(self.clus_summary_dict_lst[i][self.c_local_sync_photopath]))
+		# 	self.logger.info(str(self.clus_summary_dict_lst[i][self.c_sharepoint_photopath]))
 
+# eg. c_local_sync_photopath = {'cluster': ['C:\\Users\\kimdan\\Government of Ontario\\Regeneration Assessment Program 
+# - RAP Picture Library\\TIM-Gil01_C104_6_cluster.jpg'], 'P1': [], 'P2': [], 'P3': [], 'P4': [], 'P5': [], 'P6': [], 
+# 'P7': ['C:\\Users\\kimdan\\Government of Ontario\\Regeneration Assessment Program - RAP Picture Library\\TIM-Gil01_C104_6_P7.jpg'], 
+# 'P8': []}
 
-
-
-
+# eg. c_sharepoint_photopath = {'cluster': ['https://ontariogov.sharepoint.com/:i:/r/sites/MNRF-ROD-EXT/RAP/RAP%20Picture%20Library
+# /TIM-Gil01_C104_6_cluster.jpg'], 'P1': [], 'P2': [], 'P3': [], 'P4': [], 'P5': [], 'P6': [], 'P7': 
+# ['https://ontariogov.sharepoint.com/:i:/r/sites/MNRF-ROD-EXT/RAP/RAP%20Picture%20Library/TIM-Gil01_C104_6_P7.jpg'], 'P8': []}
 
 	def clus_summary_to_sqlite(self):
 		""" Writing the cluster summary dictionary list to a brand new table in the sqlite database.
 		"""
 		common_functions.dict_lst_to_sqlite(self.clus_summary_dict_lst, self.db_filepath, self.clus_summary_tblname, self.logger)
+
+
+
+
+
+
+
+
 
 	def summarize_projects(self):
 		"""
@@ -855,7 +906,8 @@ class Run_analysis:
 		self.sqlite_to_dict()
 		self.define_attr_names()
 		self.summarize_clusters()
-		# self.clus_summary_to_sqlite()
+		self.photo_alternate_paths()
+		self.clus_summary_to_sqlite()
 		# self.summarize_projects()
 		# self.proj_summary_to_sqlite()
 		# self.create_plot_table()

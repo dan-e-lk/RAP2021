@@ -8,7 +8,7 @@ print(sys.version)
 from modules import common_functions, csv2sqlite, determine_project_id, analysis, log, shp2sqlite, to_csv, to_browsers
 
 
-def RAP(configfilepath, initial_msg, custom_datapath = None, ignore_testdata = False):
+def RAP(configfilepath, initial_msg, custom_datapath = None, ignore_testdata = True):
 	"""configfile carries most of the static variables. configfile is typically located in the same folder as this script: SEM.cfg
 	initial_msg is used when another program such as TDT is run before this script run. The message will be carried on to the log file.
 	custom_datapath is used when TDT did is run right before this tool. custom_datapath will replace config's CSV.folderpath variable.
@@ -118,15 +118,18 @@ def RAP(configfilepath, initial_msg, custom_datapath = None, ignore_testdata = F
 		# to_b.run_all()
 
 
-		# # end of sem program
-		# logger.info('SEM program completed\n\n\n')
-
 	except:
 		# if any error encountered, log it.
+		logger.info('\n!!!!     CRITICAL ERROR     !!!!\n')
 		var = traceback.format_exc()
 		print(var)
 		logger.info(var)
 
+	finally:
+		# end of RAP program
+		timenow = common_functions.datetime_readable() #eg. Apr 21, 2020. 02:09 PM
+		logger.info('\n\nEnd Time: %s'%timenow)
+		logger.info('RAP program completed\n\n\n')
 
 
 
