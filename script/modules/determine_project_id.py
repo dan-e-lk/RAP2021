@@ -49,7 +49,7 @@ class Determine_project_id:
 		# static variables from the config file:
 		self.prj_shpfile = cfg_dict['SHP']['project_shpfile']
 		self.prjID_field = cfg_dict['SHP']['project_id_fieldname']
-		self.silvsys_fieldname = cfg_dict['SHP']['silvsys_fieldname']
+		self.silvsys_fieldname = 'SILVSYS'
 		self.shp2sqlite_tablename = cfg_dict['SHP']['shp2sqlite_tablename']		
 		self.geo_check_field = cfg_dict['SQLITE']['geo_check_fieldname'] # this field will be created in the sqlite database for each record in cluster table as each record gets assigned to each projectid.
 		self.fin_proj_id_field = cfg_dict['SQLITE']['fin_proj_id']
