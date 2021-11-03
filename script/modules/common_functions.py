@@ -162,7 +162,7 @@ def dict_lst_to_sqlite(dict_lst, db_filepath, new_tablename, logger):
 	# dict_lst shouldn't be an empty list
 	rec_count = len(dict_lst)
 	if rec_count < 1:
-		err_msg = '!!!! %s is empty!!!!!'%dict_lst
+		err_msg = '!!!! %s is empty!!!!!'%new_tablename
 		logger.info(err_msg)
 		raise Exception(err_msg)
 
@@ -183,8 +183,9 @@ def dict_lst_to_sqlite(dict_lst, db_filepath, new_tablename, logger):
 
 	# run create table query
 	try:
+		logger.info(create_t_sql)
 		cur.execute(create_t_sql)
-		logger.debug(create_t_sql)
+
 	except:
 		logger.info("* WARNING: Table '%s' already exists. Dropping and recreating the table."%new_tablename)
 		cur.execute("DROP TABLE %s"%new_tablename)	

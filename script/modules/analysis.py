@@ -47,7 +47,8 @@ class Run_analysis:
 
 		self.clus_summary_dict_lst = [] # A list of dictionaries with each dictionary representing a cluster.
 		self.proj_summary_dict_lst = [] # A list of dictionaries with each dictionary representing a project.
-		self.plot_summary_dict_lst = [] # A list of dictionaries with each dictionary representing a plot.
+		self.plot_summary_dict_lst_cc = [] # A list of dictionaries with each dictionary representing a plot.
+		self.plot_summary_dict_lst_sh = [] # A list of dictionaries with each dictionary representing a plot.
 
 		self.logger.info("\n")
 		self.logger.info("--> Running analysis module")
@@ -141,7 +142,7 @@ class Run_analysis:
 		self.p_sfl_fu = 'sfl_fu' # sfl's forest unit
 		self.p_sfl_effden = 'sfl_effden' # sfl's effective density
 
-		self.p_num_clus_surv = 'num_clus_surveyed' # number of clusters surveyed for each ProjectID
+		self.p_num_clus_surv = 'num_clusters_surveyed' # DO NOT CHANGE. number of clusters surveyed for each ProjectID 
 		self.p_lst_of_clus = 'list_of_clusters'		
 		self.p_is_complete = 'is_survey_complete' # yes or no or unknown  yes if p_matching_survey_rec >= p_num_clus
 		self.p_assess_start_date = 'assess_start_date' # earliest survey form creation date
@@ -194,7 +195,7 @@ class Run_analysis:
 			for cluster in cluster_in_dict:
 				# record dictionary will act as a template for this cluster and the values will be filled out as we go.
 				# for example, {'UnoccupiedPlot1': 'No', 'UnoccupiedreasonPlot1': '', 'Tree1SpeciesNamePlot1': 'Bf (fir, balsam)', 'Tree1HeightPlot1': '5', 'Tree2SpeciesNamePlot1': 'Sw (spruce, white)', 'Tree2HeightPlot1': '2', 'Tree3SpeciesNamePlot1': 'Sw (spruce, white)', 'Tree3HeightPlot1': '2'...}
-				self.logger.info("\tWorking on Proj[%s] Clus[%s]..."%(cluster[self.fin_proj_id], cluster['ClusterNumber']))
+				self.logger.debug("\tWorking on Proj[%s] Clus[%s]..."%(cluster[self.fin_proj_id], cluster['ClusterNumber']))
 				record = self.clus_summary_dict.copy() # each record is one cluster in a dictionary form
 
 				record[self.c_clus_uid] = cluster[self.unique_id] # cluster unique id
@@ -596,15 +597,21 @@ class Run_analysis:
 			# check for duplicate cluster number
 			duplicate_clus = set([clus_num for clus_num in cluster_num_lst if cluster_num_lst.count(clus_num) > 1])
 			if len(duplicate_clus) > 0:
-				self.logger.info("!!!! Duplicate cluster found: %s"%duplicate_clus)
+				duplicate_clus = list(duplicate_clus)
+				duplicate_clus_str = ''
+				for clus in duplicate_clus:
+					duplicate_clus_str += clus + ', '
+				duplicate_clus_str = duplicate_clus_str[:-2]
+				self.logger.info("!!!! Duplicate cluster found: %s"%duplicate_clus_str)
+				p_analysis_comments.append("Duplicate cluster found: %s"%duplicate_clus_str)
 
 			# Number of clusters surveyed as far
 			num_clus_surveyed = len(cluster_num_lst)
 			self.logger.info("\t\tSurveyed Cluster Count: %s of %s"%(num_clus_surveyed,prj['NUMCLUSTER']))
 			is_survey_complete = False if num_clus_surveyed < int(prj['NUMCLUSTER']) else True
 			record[self.p_num_clus_surv] = num_clus_surveyed
-			record[self.p_lst_of_clus] = str(cluster_num_lst)			
-			record[self.p_is_complete] = str(is_survey_complete)
+			record[self.p_lst_of_clus] = cluster_num_lst		
+			record[self.p_is_complete] = is_survey_complete
 
 
 			# Assessment start and last assessment date
@@ -618,8 +625,8 @@ class Run_analysis:
 				clus_survey_dates.sort()
 				assess_start_date = clus_survey_dates[0]
 				assess_last_date = clus_survey_dates[-1]
-			record[self.p_assess_start_date] = str(assess_start_date)
-			record[self.p_assess_last_date] = str(assess_last_date)
+			record[self.p_assess_start_date] = assess_start_date
+			record[self.p_assess_last_date] = assess_last_date
 
 
 			# Assessors (surveyors), Surveyor's FMU, Surveyor's District
@@ -636,231 +643,110 @@ class Run_analysis:
 			assessors = [i for i in set(assessors_lst) if len(i)>0]
 			surveyors_fmu = [i for i in set(surveyors_fmu_lst) if len(i)>0]
 			surveyors_dist = [i for i in set(surveyors_dist_lst) if len(i)>0]
-			record[self.p_assessors] = str(assessors) # eg. ['Mitchell Sissing', 'Group ']
-			record[self.p_fmu] = str(surveyors_fmu)
-			record[self.p_dist] = str(surveyors_dist) # eg. ['North Bay']
+			record[self.p_assessors] = assessors # eg. ['Mitchell Sissing', 'Group ']
+			record[self.p_fmu] = surveyors_fmu
+			record[self.p_dist] = surveyors_dist # eg. ['North Bay']
 
 			# comments summary
 			comments = {} # combination of all comments
-			for clus_summary in cluster_data_of_this_proj:
-				comments[clus_summary['cluster_number']] = clus_summary[self.c_comments]
-			record[self.p_comments] = str(comments) # eg. {'456': {'cluster': '', 'ecosite': '', 'P1': '',...}
+			for cluster in cluster_data_of_this_proj:
+				comments[cluster['cluster_number']] = cluster[self.c_comments]
+			record[self.p_comments] = comments # eg. {'456': {'cluster': '', 'ecosite': '', 'P1': '',...}
+
+			# Effective density data eg. {'109': 1225, '108': 1375,...}
+			effective_density_data = {}
+			for cluster in cluster_data_of_this_proj:
+				effective_density_data[cluster['cluster_number']] = cluster[self.c_eff_dens]
+			# Effective density # eg. {'mean': 1979.1667, 'stdv': 1271.9428, 'ci': 1334.8221, 'upper_ci': 3313.9888, 'lower_ci': 644.3446, 'n': 6, 'confidence': 0.95}
+			effective_density = mymath.mean_std_ci(effective_density_data) 
+			record[self.p_effect_dens_data] = effective_density_data
+			record[self.p_effect_dens] = effective_density
+
+			# number of clusters where at least 1 plot is occupied with trees # this should be the n for species calculation
+			lst_of_occupied_clus = []
+			for cluster in cluster_data_of_this_proj:
+				if cluster[self.c_site_occ] > 0:
+					lst_of_occupied_clus.append(cluster['cluster_number'])
+			lst_of_occupied_clus = list(set(lst_of_occupied_clus)) # removing duplicate clusters (there shouldn't be duplicates)
+			num_cl_occupied = len(lst_of_occupied_clus)
+			record[self.p_num_cl_occupied] = num_cl_occupied
+
+			# site occupancy
+			so_data = {} # eg. {'109': 0.875, '108': 1...}
+			so_reason = {} # eg. {'109': {'P1': 'Treed', 'P2': ''...}}, '108': {'P1': 'Shrubs', 'P2': '', }}
+			for cluster in cluster_data_of_this_proj:
+				so_data[cluster['cluster_number']]=cluster[self.c_site_occ]
+				so_reason[cluster['cluster_number']]=cluster[self.c_site_occ_reason]
+			so = mymath.mean_std_ci(so_data)
+			record[self.p_so_data] = so_data
+			record[self.p_so] = so
+			record[self.p_so_reason] = so_reason
 
 
+			# SPECIES ANALYSIS: 'species_found', 'species_grps_found', 'species_data_percent', 'species_grp_data_percent', 'spcomp', spcomp_grp'
+			spc_dict = {} # eg. {'109': {'BW': 30.0, 'SW': 70.0}, '108': {'BF': 18.2, 'LA': 9.1, 'SW': 72.7},...}
+			spc_grp_dict = {}
+			for cluster in cluster_data_of_this_proj:
+				if cluster[self.c_site_occ] > 0:
+					spc_dict[cluster['cluster_number']] = cluster[self.c_spc_comp_perc]
+					spc_grp_dict[cluster['cluster_number']] = cluster[self.c_spc_comp_grp_perc]
+			# calculate spc_found and spc_grp_found
+			spc_found = [] # eg.['CB', 'BN', 'SW', 'LA', 'BW', 'BF']
+			spc_grp_found = [] # eg. ['CB', 'BN', 'LA', 'BW', 'SX', 'BF']
+			for v in spc_dict.values():
+				for i in v.keys():
+					spc_found.append(i)
+			for v in spc_grp_dict.values():
+				for i in v.keys():
+					spc_grp_found.append(i)					
+			spc_found = list(set(spc_found))
+			spc_grp_found = list(set(spc_grp_found))
+			# calculate spc_data and spc_grp_data (n = len(lst_of_occupied_clus))
+			clusters_dict = {clus_num:0 for clus_num in lst_of_occupied_clus} # eg. {'109':0, '103':0, '104':0,...}
+			spc_data = {spc:clusters_dict.copy() for spc in spc_found} # eg. {'BF': {'109':0, '103':0}, 'BW': {'109':0, '103':0}, ...}
+			spc_grp_data = {spc:clusters_dict.copy() for spc in spc_grp_found}
+			# calculate spcomp and spcomp_grp
+			for clus_num, spc_rec in spc_dict.items():
+				for spc, perc in spc_rec.items():
+					spc_data[spc][clus_num] = perc
+			for clus_num, spc_rec in spc_grp_dict.items():
+				for spc, perc in spc_rec.items():
+					spc_grp_data[spc][clus_num] = perc
+			# calculate p_spc and p_spc_grp (mean, stdev, etc.)
+			spc = {spc: mymath.mean_std_ci(data) for spc, data in spc_data.items()}
+			spc_grp = {spc: mymath.mean_std_ci(data) for spc, data in spc_grp_data.items()}
+			record[self.p_spc_found] = spc_found # ['CE', 'BF', 'PO', 'PB', 'BW', 'PT']
+			record[self.p_spc_grp_found] = spc_grp_found # ['CE', 'BW', 'BF', 'PO']
+			record[self.p_spc_data] = spc_data # {'CE': {'25': 0, '3': 25.0, '20': 0, ...}, 'BF': {'25': 0, '3': 25.0, '20': 0,...}}
+			record[self.p_spc_grp_data] = spc_grp_data 
+			record[self.p_spc] = spc # {'CE': {'mean': 1.7857, 'stdv': 6.6815, 'ci': 3.8578, ...}, 'BF': {'mean': 1.7857, 'stdv': 6.6815, 'ci'...}}
+			record[self.p_spc_grp] = spc_grp
 
+			# ecosite
+			ecosite_data = {} # eg. {'109':['moist','rich in nutrient','some comment'], '103':['dry','',''],...}
+			for cluster in cluster_data_of_this_proj:
+				ecosite_data[cluster['cluster_number']] = [cluster[self.c_ecosite],cluster[self.c_eco_nutri],cluster[self.c_eco_comment].replace("'","")]
+			if len(ecosite_data) > 0:
+				moist = list(set([eco[0] for eco in ecosite_data.values()]))
+				eco_moisture = {i:0 for i in moist} #eg. {'moist': 0, 'dry':0, ...}
+				eco_count = 0
+				for eco in ecosite_data.values():
+					eco_moisture[eco[0]] += 1
+					eco_count += 1
+				# turn the count into percent
+				eco_moisture = {k:round(float(v)*100/eco_count, 1) for k,v in eco_moisture.items()}
+			else:
+				eco_moisture = {} 
+			record[self.p_ecosite_data] = ecosite_data # {'356': ['fresh', 'Moderately Rich', ''], '357': ['fresh', 'Moderately Rich', ''],...}
+			record[self.p_eco_moisture] = eco_moisture # {'moist': 3.3, 'wet': 3.3, 'fresh': 93.3}
 
-
-
-
-
-
-
-			# # copying information from the Project_Survey table to this summary table:
-			# # need to first find the corresponding project_survey record.
-			# survey_rec_w_matching_projid = [i for i in self.project_in_dict if i['ProjectID'].upper() == prj_id.upper()]
-			# # should only be one record with this projid.
-			# num_found = len(survey_rec_w_matching_projid)
-			# record[self.p_matching_survey_rec] = num_found
-			# if num_found < 1:
-			# 	self.logger.debug('WARNING: no matching record for ProjectID: %s'%prj_id)
-			# 	survey_rec = None
-			# elif num_found > 1:
-			# 	self.logger.info('!!!! multiple matching project survey records for ProjectID = %s !!!!'%prj_id)
-			# 	survey_rec = survey_rec_w_matching_projid[0]
-			# else:
-			# 	survey_rec = survey_rec_w_matching_projid[0]
-
-			# if survey_rec != None:
-			# 	record[self.p_assessment_date] = survey_rec['Date'][:10]
-			# 	record[self.p_assessors] = survey_rec['Surveyors']
-			# 	# record[self.p_lat] = survey_rec['latitude']
-			# 	# record[self.p_lon] = survey_rec['longitude']
-			# 	record[self.p_comments] = survey_rec['Comments'].replace("'","")
-			# 	record[self.p_photos] = survey_rec['Photos']
-			# 	record[self.p_fmu] = survey_rec['ForestManagementUnit']
-			# 	record[self.p_dist] = survey_rec['DistrictName']
-
-
-			# # will loop through matching cluster_summary records and start analysing!
-			# cluster_rec_w_matching_projid = [i for i in self.clus_summary_dict_lst if i[self.c_proj_id] == prj_id]
-			# num_match = len(cluster_rec_w_matching_projid)
-
-			# # if there are matching cluster surveys but no matching project survey
-			# if num_found < 1 and num_match > 0:
-			# 	self.logger.info('!!!! no matching project survey record found for ProjectID = %s !!!!'%prj_id)
-
-			# # deemed complete if number of surveyed clusters equals to the total clusters
-			# total_num_of_clus = int(record[self.p_num_clus] or -1)
-			# if total_num_of_clus < 1:
-			# 	is_complete = 'unknown'
-			# elif num_match < total_num_of_clus:
-			# 	is_complete = 'no'
-			# elif num_match == total_num_of_clus:
-			# 	is_complete = 'yes'
-			# else:
-			# 	extra = num_match - total_num_of_clus
-			# 	is_complete = 'yes (+%s)'%extra
-			# num_clus_surveyed = num_match
-			# record[self.p_num_clus_surv] = num_clus_surveyed
-			# record[self.p_is_complete] = is_complete
-
-			# # loop through each cluster to grab information.
-			# p_lst_of_clus = []
-			# p_effect_dens_data = {} # eg. {'109': 1225, '108': 1375,...}
-			# p_so_data = {}
-			# p_so_reason = {}
-			# spc_dict = {} # eg. {'109': {'BW': 30.0, 'SW': 70.0}, '108': {'BF': 18.2, 'LA': 9.1, 'SW': 72.7},...}
-			# spc_grp_dict = {}
-			# residual_dict = {} # eg. {'109': {'SW': 3, 'PW': 1}, '108': {'PB': 6, 'BF': 3},...}
-			# ecosite_dict = {} # eg. {'109':['moist','rich in nutrient','some comment'], '103':['dry','',''],...}
-			# lst_of_occupied_clus = []
-			# p_num_cl_occupied = 0
-			# clus_survey_dates = [] # eg. ['2020-06-04', '2020-04-14']
-			# for cluster in cluster_rec_w_matching_projid:
-			# 	cluster_num = cluster[self.c_clus_num]
-			# 	p_lst_of_clus.append(cluster_num)
-			# 	p_effect_dens_data[cluster_num] = cluster[self.c_eff_dens]
-			# 	p_so_data[cluster_num] = cluster[self.c_site_occ]
-			# 	p_so_reason[cluster_num] = cluster[self.c_site_occ_reason]
-			# 	residual_dict[cluster_num] = cluster[self.c_residual]
-			# 	ecosite_dict[cluster_num] = [cluster[self.c_ecosite],cluster[self.c_eco_nutri],cluster[self.c_eco_comment].replace("'","")]
-			# 	clus_survey_dates.append(cluster[self.c_creation_date])
-			# 	if cluster[self.c_site_occ] > 0:
-			# 		lst_of_occupied_clus.append(cluster_num)
-			# 		p_num_cl_occupied += 1
-			# 		spc_dict[cluster_num] = cluster[self.c_spc_comp_perc]
-			# 		spc_grp_dict[cluster_num] = cluster[self.c_spc_comp_grp_perc]
-
-			# # get last cluster survey date
-			# if len(clus_survey_dates) < 1:
-			# 	p_clus_last_surv_date = ''
-			# else:
-			# 	clus_survey_dates.sort()
-			# 	p_clus_last_surv_date = clus_survey_dates[-1]
-
-			# # check for duplicate cluster number
-			# check = mymath.check_duplicates(p_lst_of_clus) # eg. '701, 144'
-			# if check != None:
-			# 	warning_txt = "Duplicate cluster(s) found in project %s: %s"%(prj_id, check[1])
-			# 	p_analysis_comments.append(warning_txt)
-			# 	self.logger.info("!!!! %s !!!!"%warning_txt)
-
-			# # calculate effective density
-			# p_effect_dens = mymath.mean_std_ci(p_effect_dens_data) # eg. {'mean': 1979.1667, 'stdv': 1271.9428, 'ci': 1334.8221, 'upper_ci': 3313.9888, 'lower_ci': 644.3446, 'n': 6, 'confidence': 0.95}
-			
-			# # calculate site occupancy
-			# p_so = mymath.mean_std_ci(p_so_data) # eg. {'mean': 0.7708, 'stdv': 0.3826, 'ci': 0.4015, 'upper_ci': 1.1723, 'lower_ci': 0.3693, 'n': 6, 'confidence': 0.95}
-
-			# # calculate spc_found and spc_grp_found
-			# p_spc_found = [] # eg.['CB', 'BN', 'SW', 'LA', 'BW', 'BF']
-			# p_spc_grp_found = [] # eg. ['CB', 'BN', 'LA', 'BW', 'SX', 'BF']
-			# for v in spc_dict.values():
-			# 	for i in v.keys():
-			# 		p_spc_found.append(i)
-			# for v in spc_grp_dict.values():
-			# 	for i in v.keys():
-			# 		p_spc_grp_found.append(i)					
-			# p_spc_found = list(set(p_spc_found))
-			# p_spc_grp_found = list(set(p_spc_grp_found))
-
-			# # calculate spc_data and spc_grp_data (n = len(lst_of_occupied_clus))
-			# clusters = list(set(lst_of_occupied_clus))
-			# clusters_dict = {clus_num:0 for clus_num in clusters} # eg. {'109':0, '103':0, '104':0,...}
-			# p_spc_data = {spc:clusters_dict.copy() for spc in p_spc_found} # eg. {'BF': {'109':0, '103':0}, 'BW': {'109':0, '103':0}, ...}
-			# p_spc_grp_data = {spc:clusters_dict.copy() for spc in p_spc_grp_found}
-
-			# for clus_num, spc_rec in spc_dict.items():
-			# 	for spc, perc in spc_rec.items():
-			# 		p_spc_data[spc][clus_num] = perc
-			# for clus_num, spc_rec in spc_grp_dict.items():
-			# 	for spc, perc in spc_rec.items():
-			# 		p_spc_grp_data[spc][clus_num] = perc
-
-			# # calculate p_spc and p_spc_grp (mean, stdev, etc.)
-			# p_spc = {spc: mymath.mean_std_ci(data) for spc, data in p_spc_data.items()}
-			# p_spc_grp = {spc: mymath.mean_std_ci(data) for spc, data in p_spc_grp_data.items()}
-
-
-			# # calcualte residuals (n = len(p_lst_of_clus))
-			# res_spc_found = []
-			# for clus, res_record in residual_dict.items():
-			# 	for spc_name in res_record.keys():
-			# 		res_spc_found.append(spc_name)
-			# res_spc_found = list(set(res_spc_found))
-			# if len(res_spc_found) > 0:
-			# 	# get residual_data		
-			# 	r_clusters = list(set(p_lst_of_clus))
-			# 	r_clusters_dict = {clus_num:0 for clus_num in r_clusters}
-			# 	p_residual_data = {spc:r_clusters_dict.copy() for spc in res_spc_found} # eg. {'PW': {'109':0, '103':0}, 'BW': {'109':0, '103':0}, ...}
-			# 	for r_clus, r_record in residual_dict.items():
-			# 		for species, num in r_record.items():
-			# 			p_residual_data[species][r_clus] = num
-				
-			# 	# calculate residual_count
-			# 	p_residual_count = {spc:0 for spc in res_spc_found} # eg. {'PW': 0, 'BW': 0, 'MR': 0, ...}
-			# 	r_total_count = 0
-			# 	for r_spc, r_record in p_residual_data.items():
-			# 		for r_count in r_record.values():
-			# 			p_residual_count[r_spc] += r_count
-			# 			r_total_count += r_count
-				
-			# 	# calculate residual_percent
-			# 	p_residual_percent = {spc:0 for spc in res_spc_found} # eg. {'PW': 0, 'BW': 0, 'MR': 0, ...}
-			# 	for r_spc, r_count in p_residual_count.items():
-			# 		percent = round((float(r_count)/r_total_count) * 100, 1)
-			# 		p_residual_percent[r_spc] = percent
-				
-			# 	# calculate BA (total number of trees * 2 / n, where n =total number of clusters)
-			# 	p_residual_BA = {spc:0 for spc in res_spc_found} # eg. {'PW': 0, 'BW': 0, 'MR': 0, ...}	
-			# 	for r_spc, r_count in p_residual_count.items():
-			# 		ba = round(float(r_count)*2/num_clus_surveyed, 2)
-			# 		p_residual_BA[r_spc] = ba
-			# else:
-			# 	p_residual_data = {} # used to be 'no data'
-			# 	p_residual_count = {} # used to be 'no data'
-			# 	p_residual_percent = {} # used to be 'no data'
-			# 	p_residual_BA = {} # used to be 'no data'
-
-			
-			# # calculate ecosite
-			# p_ecosite_data = ecosite_dict # eg. {'109':['moist','rich in nutrient','some comment'], '103':['dry','',''],...}
-			# if len(p_ecosite_data) > 0:
-			# 	moist = list(set([eco[0] for eco in p_ecosite_data.values()]))
-			# 	p_eco_moisture = {i:0 for i in moist} #eg. {'moist': 0, 'dry':0, ...}
-			# 	eco_count = 0
-			# 	for eco in p_ecosite_data.values():
-			# 		p_eco_moisture[eco[0]] += 1
-			# 		eco_count += 1
-			# 	# turn the count into percent
-			# 	p_eco_moisture = {k:round(float(v)*100/eco_count, 1) for k,v in p_eco_moisture.items()}
-			# else:
-			# 	p_eco_moisture = {} # used to be 'no data'
-
-			# # put all the calculated values to the record dictionary
-			# record[self.p_clus_last_surv_date] = p_clus_last_surv_date
-			# record[self.p_lst_of_clus] = p_lst_of_clus
-			# record[self.p_effect_dens_data] = p_effect_dens_data
-			# record[self.p_effect_dens] = p_effect_dens
-			# record[self.p_num_cl_occupied] = p_num_cl_occupied
-			# record[self.p_so_data] = p_so_data
-			# record[self.p_so] = p_so
-			# record[self.p_so_reason] = p_so_reason
-			# record[self.p_spc_found] = p_spc_found
-			# record[self.p_spc_grp_found] = p_spc_grp_found
-			# record[self.p_spc_data] = p_spc_data
-			# record[self.p_spc_grp_data] = p_spc_grp_data
-			# record[self.p_spc] = p_spc
-			# record[self.p_spc_grp] = p_spc_grp
-			# record[self.p_residual_data] = p_residual_data
-			# record[self.p_residual_count] = p_residual_count
-			# record[self.p_residual_percent] = p_residual_percent
-			# record[self.p_residual_BA] = p_residual_BA
-			# record[self.p_ecosite_data] = p_ecosite_data
-			# record[self.p_eco_moisture] = p_eco_moisture			
-			# record[self.p_analysis_comments] = p_analysis_comments
+			# add analysis comments and warnings
+			record[self.p_analysis_comments] = p_analysis_comments
 
 			# finally, append the record to the table
 			self.proj_summary_dict_lst.append(record)
+
+
 
 	def proj_summary_to_sqlite(self):
 		""" Writing the cluster summary dictionary list to a brand new table in the sqlite database.
@@ -868,31 +754,30 @@ class Run_analysis:
 		common_functions.dict_lst_to_sqlite(self.proj_summary_dict_lst, self.db_filepath, self.proj_summary_tblname, self.logger)
 
 
+
 	def create_plot_table(self):
 		"""
-		go through self.clus_summary_dict_lst again and create a plot summary table on the sqlite database.
+		go through self.clus_summary_dict_lst again and create two plot summary tables on the sqlite database. (one for CC and one for SH)
 		This table would be closest thing to the raw data collected.
 		"""
 		# first we need a list of all species codes found in the raw data
 		# this list will be used to create attribute names of the plot_summary table.
 		all_spc_codes_from_raw_data = []
 		for record in self.clus_summary_dict_lst:
-			for data in record[self.c_spc_count].values(): # eg. data = {'BF': 1, 'SW': 2}
-				for spc_code in data.keys():
-					if len(spc_code) > 0 and spc_code not in all_spc_codes_from_raw_data:
-						all_spc_codes_from_raw_data.append(spc_code)
+			for data in record[self.c_spc_count].values(): # eg. data =  [{'PL': 1, 'MR': 1}, {}] or just None
+				if data != None:
+					for item in data: # eg. item = {'PL': 1, 'MR': 1}
+						for spc_code in item.keys():
+							if len(spc_code) > 0 and spc_code not in all_spc_codes_from_raw_data:
+								all_spc_codes_from_raw_data.append(spc_code)
 		all_spc_codes_from_raw_data.sort()
 
-		# plot summary table will have these attributes (plus the spc codes above as attributes)
-		plot_tbl_attr = ['proj_id','cluster_num','plot_num','spc_and_height','count_of_all_trees','max_num_of_trees_for_spcomp_calc']
-		plot_tbl_attr_other = ['site_occupied','reason_for_unoccupancy','photos']
-		plot_tbl_attr_all = plot_tbl_attr + all_spc_codes_from_raw_data + plot_tbl_attr_other
-
 		# create a record template
-		plot_summary_dict = {attr:'' for attr in plot_tbl_attr_all}
+		plot_summary_dict = {}
 
 		# loop through the clusters and populate each records
 		for clus_record in self.clus_summary_dict_lst:
+			silvsys = clus_record[self.c_silvsys] # 'CC' or 'SH'
 			# loop through the number of plots we have
 			for i in range(self.num_of_plots):
 				plot_record = plot_summary_dict.copy()
@@ -902,31 +787,51 @@ class Run_analysis:
 				plot_record['proj_id'] = clus_record[self.c_proj_id]
 				plot_record['cluster_num'] = clus_record[self.c_clus_num]
 				plot_record['plot_num'] = plotnum
-				plot_record['spc_and_height'] = clus_record[self.c_all_spc][plotname]
-				plot_record['count_of_all_trees'] = len(clus_record[self.c_all_spc][plotname])
-				plot_record['max_num_of_trees_for_spcomp_calc'] = self.calc_max
-
-				# get tree counts for each species for each plot
-				for spc_code in all_spc_codes_from_raw_data:
-					try:
-						spc_count = clus_record[self.c_spc_count][plotname][spc_code]
-					except KeyError:
-						spc_count = 0
-					plot_record[spc_code] = spc_count
-
-				# extra stuff
 				plot_record['site_occupied'] = clus_record[self.c_site_occ_raw][plotname]
 				plot_record['reason_for_unoccupancy'] = clus_record[self.c_site_occ_reason][plotname]
-				plot_record['photos'] = clus_record[self.c_photos][plotname]
 
-				self.plot_summary_dict_lst.append(plot_record)
+				# get tree counts for each species for each plot
+				# note that for each species, we need 2 counts - one for 8sqm and one for 16sqm
+				if silvsys == 'SH':
+					plotsizes = ['8sqm', '16sqm']
+					for spc_code in all_spc_codes_from_raw_data:
+						for index, plotsize in enumerate(plotsizes):
+							spc_count = clus_record[self.c_spc_count] # eg {'P1': [{'PL': 1, 'MR': 1}, {}], 'P2': None,...}
+							try:
+								spc_count = spc_count[plotname][index][spc_code]
+							except (KeyError, TypeError):
+								spc_count = 0
+							plot_record[spc_code+'_'+plotsize] = spc_count
+					self.plot_summary_dict_lst_sh.append(plot_record)
+				else:
+					for spc_code in all_spc_codes_from_raw_data:
+						spc_count = clus_record[self.c_spc_count] # eg {'P1': [{'PL': 1, 'MR': 1}, {}], 'P2': None,...}
+						try:
+							spc_count = spc_count[plotname][0][spc_code]
+						except (KeyError, TypeError):
+							spc_count = 0
+						plot_record['_'+spc_code] = spc_count
+
+					self.plot_summary_dict_lst_cc.append(plot_record)
+
 
 		# create the table on the sqlite database
-		common_functions.dict_lst_to_sqlite(self.plot_summary_dict_lst, self.db_filepath, self.plot_summary_tblname, self.logger)
+		self.plotcount_cc_sh = {'CC': len(self.plot_summary_dict_lst_cc), 'SH':len(self.plot_summary_dict_lst_sh)}
+		if self.plotcount_cc_sh['CC'] > 0:
+			common_functions.dict_lst_to_sqlite(self.plot_summary_dict_lst_cc, self.db_filepath, self.plot_summary_tblname + '_cc', self.logger)
+		else:
+			self.logger.info("!!!! There's no CC clusters/plots. Cannot create plot summary table for CC")
+		if self.plotcount_cc_sh['SH'] > 0:	
+			common_functions.dict_lst_to_sqlite(self.plot_summary_dict_lst_sh, self.db_filepath, self.plot_summary_tblname + '_sh', self.logger)
+		else:
+			self.logger.info("!!!! There's no SH clusters/plots. Cannot create plot summary table for SH")
+
+
+
 
 
 	def create_z_tables(self):
-		""" a table will be created for each project. table name example: z_BuildingNorth
+		""" a table will be created for each project. table name example: z_NOR-PAPINEAU-2
 		Each of these tables will carry processed data in a easily readable format.
 		This will make it easy to print out on browsers and etc.
 		Ingredients:
@@ -934,7 +839,7 @@ class Run_analysis:
 			self.clus_summary_dict_lst
 		"""
 		
-		active_projs = [record['proj_id'] for record in self.proj_summary_dict_lst if int(record['num_clusters_surveyed']) > 0]
+		active_projs = [record['proj_id'] for record in self.proj_summary_dict_lst if int(record[self.p_num_clus_surv]) > 0]
 
 		# create tables
 		for proj in active_projs:
@@ -944,8 +849,8 @@ class Run_analysis:
 			num_of_rows = len(lst_of_clus)
 			
 			# deciding the attributes for this new table
-			attr = ['Cluster_Num', 'Site_Occ', 'Ef_Density', 'Moisture']
-			spc_list = sorted(proj_sum_dict[self.p_spc_found]) # ['AB', 'CE', 'PB', 'PT', 'PW', 'SB', 'SW']
+			attr = ['Cluster_Num', 'Site_Occ', 'Ef_Density', 'Moisture', 'Silvsys']
+			spc_list = sorted(['_'+ spcname for spcname in proj_sum_dict[self.p_spc_found]]) # ['_AB', '_CE', '_OR', '_PT', '_PW', '_SB', '_SW']
 			attr += spc_list
 
 			# making an empty list of dictionaries which will later turn into a table
@@ -956,12 +861,13 @@ class Run_analysis:
 			for clus in lst_of_clus:
 				rec = rec_template.copy()
 				rec['Cluster_Num'] = clus
-				rec['Site_Occ'] = proj_sum_dict[self.p_so_data][clus]
-				rec['Ef_Density'] = proj_sum_dict[self.p_effect_dens_data][clus]
-				rec['Moisture'] = proj_sum_dict[self.p_ecosite_data][clus][0]
+				rec['Site_Occ'] = proj_sum_dict[self.p_so_data][clus] # 0.75
+				rec['Ef_Density'] = proj_sum_dict[self.p_effect_dens_data][clus] # 1446
+				rec['Moisture'] = proj_sum_dict[self.p_ecosite_data][clus][0] # 'moist'
+				rec['Silvsys'] = proj_sum_dict[self.p_silvsys] # 'CC'
 				for spc in spc_list:
 					try:
-						rec[spc] = proj_sum_dict[self.p_spc_data][spc][clus] # percent of that species in this cluster
+						rec[spc] = proj_sum_dict[self.p_spc_data][spc[1:]][clus] # percent of that species in this cluster
 					except KeyError:
 						rec[spc] = 0
 				table.append(rec)
@@ -982,8 +888,8 @@ class Run_analysis:
 		self.clus_summary_to_sqlite()
 		self.summarize_projects()
 		self.proj_summary_to_sqlite()
-		# self.create_plot_table()
-		# self.create_z_tables()
+		self.create_plot_table()
+		self.create_z_tables()
 
 
 

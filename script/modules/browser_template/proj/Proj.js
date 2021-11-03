@@ -23,10 +23,6 @@ $("#processed_data").on("click", function(){
 	$(".processed_data").fadeIn(200)
 })
 
-$("#raw_data").on("click", function(){
-	$(".tab").hide()
-	$(".raw_data").fadeIn(200)
-})
 
 $("#pictures").on("click", function(){
 	$(".tab").hide()

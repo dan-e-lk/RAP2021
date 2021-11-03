@@ -37,6 +37,7 @@ def RAP(configfilepath, initial_msg, custom_datapath = None, ignore_testdata = T
 	logger.info('Config file used: %s'%configfilepath)
 	logger.info('Survey Data being used: %s'%cfg_dict['INPUT']['inputdatafolderpath'])
 	logger.info('All variables from the config file:\n' + pprint.pformat(cfg_dict))
+	logger.info('Ignore Test Data: %s'%ignore_testdata)
 
 
 	try:
@@ -61,8 +62,7 @@ def RAP(configfilepath, initial_msg, custom_datapath = None, ignore_testdata = T
 		db_output_path = os.path.join(output_folderpath, 'sqlite')
 		csv_output_path = os.path.join(output_folderpath, 'csv')
 		browser_output_path = os.path.join(output_folderpath, 'browser')
-		img_output_path = os.path.join(browser_output_path, 'img')
-		for path in [db_output_path, csv_output_path, browser_output_path, img_output_path]:
+		for path in [db_output_path, csv_output_path, browser_output_path]:
 			os.mkdir(path)
 
 
@@ -105,17 +105,18 @@ def RAP(configfilepath, initial_msg, custom_datapath = None, ignore_testdata = T
 		ana = analysis.Run_analysis(cfg_dict, db_filepath, clearcut_tbl_name, shelterwood_tbl_name, spc_to_check, spc_group_dict, logger)
 		ana.run_all()
 		# we will need the attribute names of cluster summary and proj summary tables:
-		# clus_summary_attr = ana.clus_summary_attr # eg. {'c_clus_uid': 'cluster_uid', 'c_clus_num': 'cluster_number', 'c_proj_id': 'proj_id',...}
-		# proj_summary_attr = ana.proj_summary_attr
+		clus_summary_attr = ana.clus_summary_attr # eg. {'c_clus_uid': 'cluster_uid', 'c_clus_num': 'cluster_number', 'c_proj_id': 'proj_id',...}
+		proj_summary_attr = ana.proj_summary_attr
+		plotcount_cc_sh = ana.plotcount_cc_sh
 
 
-		# # to_csv
-		# tocsv = to_csv.To_csv(cfg_dict, db_filepath, clus_summary_attr, proj_summary_attr, logger)
-		# tocsv.run_all()
+		# to_csv
+		tocsv = to_csv.To_csv(cfg_dict, db_filepath, clus_summary_attr, proj_summary_attr, plotcount_cc_sh, logger)
+		tocsv.run_all()
 
-		# # to_browsers
-		# to_b = to_browsers.To_browsers(cfg_dict, db_filepath, logger)
-		# to_b.run_all()
+		# to_browsers
+		to_b = to_browsers.To_browsers(cfg_dict, db_filepath, logger)
+		to_b.run_all()
 
 
 	except:

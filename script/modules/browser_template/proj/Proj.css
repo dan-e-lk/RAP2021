@@ -9,14 +9,15 @@ h1 {
 	line-height: 1.1;
 	font-weight: normal;
 	color: white;
-	background: #9dc209;
+/*	background: #9dc209;*/
+	background: #A04000;
 	margin: 0;
 	text-transform: uppercase;
 	padding: 20px 0;
 }
 
 #stripe {
-	background: #e6f8d4;
+	background: #F6DDCC;
 	height: 30px;
 	text-align: center;
 	color: black;
@@ -29,7 +30,7 @@ button {
 	height: 100%;
 	min-width: 100px;
 	font-weight: 700;
-	color: #9dc209;
+	color: #A04000;
 	letter-spacing: 1px;
 	font-size: inherit;
 	transition: all 0.3s;
@@ -40,12 +41,12 @@ button {
 
 button:hover {
 	color: white;
-	background: #9dc209;
+	background: #A04000;
 }
 
 .selected {
 	color: white;
-	background: #9dc209;
+	background: #A04000;
 }
 
 .tab {
@@ -53,6 +54,11 @@ button:hover {
 	margin: 40px auto;
 }
 
+#home {
+	width: 90%;
+	margin: auto;
+	font-size: 80%;
+}
 
 /*.processed_data {
 	width: 80%;
@@ -61,7 +67,7 @@ button:hover {
 */
 #mapid {
 	margin: 40px auto;
-	height: 600px;
+	height: 800px;
 	width: 100%;
 }
 

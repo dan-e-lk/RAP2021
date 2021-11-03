@@ -8,9 +8,9 @@ import sqlite3, os, shutil
 
 # importing custom modules
 if __name__ == '__main__':
-	import common_functions
+	import common_functions, html_to_aspx
 else:
-	from modules import common_functions
+	from modules import common_functions, html_to_aspx
 
 
 
@@ -20,9 +20,8 @@ class To_browsers:
 		self.logger = logger
 		self.clus_summary_tblname = cfg_dict['SQLITE']['clus_summary_tblname']
 		self.proj_summary_tblname = cfg_dict['SQLITE']['proj_summary_tblname']
-		self.plot_summary_tblname = cfg_dict['SQLITE']['plot_summary_tblname']
 		self.projects_shp = cfg_dict['SHP']['shp2sqlite_tablename']
-		self.dst_path = cfg_dict['html']['output_folder']
+		self.dst_path = os.path.join(cfg_dict['OUTPUT']['outputfolderpath'], 'browser')
 		self.report_doc_path = cfg_dict['PDF']['report_folder']
 		self.ref_doc_path = cfg_dict['PDF']['ref_folder']
 
@@ -33,7 +32,6 @@ class To_browsers:
 
 	def tbl_2_dict(self):
 		"""Turns sqlite tables into list of dictionaries"""
-		self.plot_summary_dict = common_functions.sqlite_2_dict(self.db_filepath, self.plot_summary_tblname)
 		self.clus_summary_dict = common_functions.sqlite_2_dict(self.db_filepath, self.clus_summary_tblname)
 		self.proj_summary_dict = common_functions.sqlite_2_dict(self.db_filepath, self.proj_summary_tblname)
 
@@ -100,9 +98,9 @@ class To_browsers:
 			spatial_FMU AS "FMU", 
 			spatial_MNRF_district AS "District", 
 			num_clusters_surveyed||" of "||num_clusters_total AS "Clusters Surveyed",
-			last_cluster_survey_date AS "Last Survey Date",
+			assess_last_date AS "Last Survey Date",
 			ROUND(area_ha,1) AS "Area ha",
-			assessors AS "Assessors",
+			silvsys AS "SILVSYS",
 			ROUND(lat,5) AS lat,
 			ROUND(lon,5) AS lon
 			FROM %s
@@ -238,10 +236,10 @@ class To_browsers:
 			proj_surveyed = proj_info_dict['Clusters Surveyed'] # eg. '9 of 30'
 			proj_latlon = '%s, %s'%(proj_info_dict['lat'], proj_info_dict['lon']) # eg. '48.49337, -81.34618'
 			proj_area = proj_sum_dict['area_ha']
-			proj_start_date = proj_sum_dict['assessment_date']
+			proj_start_date = proj_sum_dict['assess_start_date']
 			proj_last_date = proj_info_dict['Last Survey Date']
-			proj_assessors = proj_info_dict['Assessors']
-			proj_comments = proj_sum_dict['project_comments']
+			proj_assessors = proj_sum_dict['assessors']
+			proj_comments = proj_comments_summary(proj_sum_dict['all_comments'])
 
 			html = """\n\n<table id="noline">
 			<tr><td><strong>Project ID:</strong></td> 					<td>{0}</td></tr>
@@ -251,7 +249,7 @@ class To_browsers:
 			<tr><td><strong>Date First Surveyed:</strong></td> 			<td>{4}</td></tr>
 			<tr><td><strong>Date Last Surveyed:</strong></td> 			<td>{5}</td></tr>
 			<tr><td><strong>Surveyed by:</strong></td> 					<td>{6}</td></tr>
-			<tr><td><strong>Comments on Project Location: </strong></td><td>{7}</td></tr>
+			<tr><td><strong>Comments: </strong></td>					<td>{7}</td></tr>
 			</table>\n""".format(proj, proj_surveyed, proj_latlon, proj_area, proj_start_date, proj_last_date, proj_assessors, proj_comments)
 
 			# SFL's data
@@ -298,12 +296,6 @@ class To_browsers:
 			ed = eval(proj_sum_dict['effective_density']) # eg. {'mean': 1979.1667, 'stdv': 1271.9428, ...}
 			html += so_ed_to_html_table(so,ed, "MNRF Site Occupancy and Effective Density")[1]
 
-			# residuals
-			res_count = eval(proj_sum_dict['residual_count']) # eg. {'BF': 13, 'PB': 6, 'PW': 4, 'MR': 2, 'SW': 3}
-			res_percent = eval(proj_sum_dict['residual_percent']) # eg. {'BF': 46.4, 'PB': 21.4, 'PW': 14.3, 'MR': 7.1, 'SW': 10.7}
-			res_BA = eval(proj_sum_dict['residual_BA']) # eg. {'BF': 4.33, 'PB': 2.0, 'PW': 1.33, 'MR': 0.67, 'SW': 1.0}
-			html += res_to_html_table(res_count, res_percent, res_BA, "MNRF Residuals")[1]
-
 			# Ecosite moisture
 			ecosite = eval(proj_sum_dict['ecosite_moisture']) # eg. {'fresh': 66.7, 'moist': 16.7, 'dry': 16.7}
 			html += ecosite_to_html_table(ecosite, 'MNRF Ecosite Moisture')[1]
@@ -312,7 +304,7 @@ class To_browsers:
 
 	def create_proj_pages3(self):
 		"""Reads each projectid.html file and adds rest of the sections - Processed Data, Raw Data, and Pictures
-		This method is all about replacing $$Summary%% text in each of the projectid.html files.
+		This method is all about replacing $$ProcessedData%%, $$RawData%%, and $$Pictures%% text in each of the projectid.html files.
 		"""
 		self.logger.debug("running create_proj_pages3 method")
 
@@ -331,49 +323,36 @@ class To_browsers:
 			common_functions.replace_txt_in_file(txtfile = htmlfilepath, being_replaced='$$ProcessedData%%', replacing_with=html)
 
 
-			# ### Raw Data Section ###
+			# # ### Raw Data Section ###
+			# html = ''
+			# sql = """SELECT cluster_number, creation_date, spc_count, total_num_trees, effective_density, site_occ, 
+			# 		site_occ_reason, cluster_comments, ecosite_moisture, ecosite_nutrient, ecosite_comment, lat, lon
+			# 		FROM Cluster_Summary WHERE proj_id = '%s'
+			# 		ORDER BY cluster_number"""%proj
+			# html += common_functions.sqlite_2_html(sqlite_db_file = self.db_filepath, tablename = 'Cluster_Summary', query=sql)
+			# common_functions.replace_txt_in_file(txtfile = htmlfilepath, being_replaced='$$RawData%%', replacing_with=html)
+
+
+			### Photos Section ###
 			html = ''
-			sql = """SELECT cluster_number, creation_date, all_spc_collected, total_num_trees, spc_tallest_selected_count, site_occ, 
-					site_occ_reason, cluster_comments, residual, ecosite_moisture, ecosite_nutrient, ecosite_comment, lat, lon
-					FROM Cluster_Summary WHERE proj_id = '%s'
-					ORDER BY cluster_number"""%proj
-			html += common_functions.sqlite_2_html(sqlite_db_file = self.db_filepath, tablename = 'Cluster_Summary', query=sql)
-			common_functions.replace_txt_in_file(txtfile = htmlfilepath, being_replaced='$$RawData%%', replacing_with=html)
+			clus_sum_dict = [summary for summary in self.clus_summary_dict if summary['proj_id'] == proj] # records in Cluster_Summary table where the record's proj_id matches with current proj_id
+			clus_lst = [int(clus['cluster_number']) for clus in clus_sum_dict]
+			clus_lst.sort()
 
+			# extra layer of complexity here to make sure the cluster numbers are sorted
+			for sorted_clus in clus_lst:
+				for clus in clus_sum_dict:
+					clus_num = int(clus['cluster_number'])
+					if sorted_clus == clus_num:
+						clus_comments = eval(clus['cluster_comments']) # eg. {'cluster': '', 'ecosite': '', 'P1': '', 'P2': '', 'P3': '', ... 'P8': ''}
+						photo_path = eval(clus['sharepoint_photopath']) # eg. {'cluster': ['https://ontariogov.sharepoint.com/:i:/r/sites/MNRF-ROD-EXT/RAP/RAP%20Picture%20Library/2021/CHA-MISS-2021-BLK-17_C73_cluster_8e67_2021-10-28.jpg'], 'P1': [], 'P2': [], ... 'P7': [], 'P8': []}
 
-			# ### Photos Section ###
-			html = ''
-			proj_sum_dict = [summary for summary in self.proj_summary_dict if summary['proj_id'] == proj][0] # eg. {"proj_id": "JVBonhomme", "sfl_so" = '0.9', ...}
-			clus_sum_dict = [summary for summary in self.clus_summary_dict if summary['proj_id'] == proj] # this will output a list of dictionaries where each dict is a cluster(record) in Cluster_Summary table.
+						for location, path_lst in photo_path.items():
+							if len(path_lst) > 0:
+								comm = "C%s %s photo. %s"%(clus_num, location, clus_comments[location])
+								for path in path_lst:
+									html += make_photo_gallery(path, comm)
 
-			# work on the project survey's photos first
-			proj_photos = proj_sum_dict['project_photos'].split('|') # will return [''] if no photo. will return ['https:/..', 'https:/...'] if more than one photos
-			proj_comment = proj_sum_dict['project_comments'] # eg "This is a project comment"
-
-			for photo_href in proj_photos:
-				if photo_href != '':
-					desc = "Project Survey Photo. %s"%proj_comment
-					html += make_photo_gallery(photo_href, desc)
-
-			# cluster/plot photos
-			for clus in clus_sum_dict:
-				clus_num = clus['cluster_number']
-				clus_photos = eval(clus['photos']) # eg. {'P1': 'https://app.trimbleinsphere.com/api/features/images/7e92b', 'P2': '', 'P3': '', 'P4': '', ...}
-				clus_photos = {k:[v.split('|')] for k,v in clus_photos.items()} # eg. {'P1': [['https://app.trimbleinsphere.com/api/features/images/7e92b']], 'P2': [['']], 'P3': [['']], ...}
-				clus_comments = eval(clus['cluster_comments']) # eg. {'P1': 'Some Comments blah blah', 'P2': '', 'P3': '', 'P4': '', ...}
-
-				photos_n_comments = {}
-				for k, v in clus_photos.items():
-					key = k.replace('P', 'Plot ')
-					v.append(clus_comments[k]) # eg. [['https://app.trimbleinsphere.com/api/features/images/7e92b'], 'Some Comments blah blah']
-					photos_n_comments[key] = v # eg. {'Plot 1': [['https://app.trimbleinsphere.com/api/features/images/7e92b'], 'Some Comments blah blah'], 'Plot 2': [[''], ''], ...}
-
-				for plot, value in photos_n_comments.items():
-					if value[0][0] != '':
-						photo_hrefs = value[0]
-						comment = "Cluster %s %s. %s"%(clus_num, plot, value[1])
-						for href in photo_hrefs:
-							html += make_photo_gallery(href, comment)
 
 			if html == '': html = 'No photos were taken.'
 			common_functions.replace_txt_in_file(txtfile = htmlfilepath, being_replaced='$$Pictures%%', replacing_with=html)
@@ -444,6 +423,15 @@ class To_browsers:
 
 
 
+	def create_aspx_files(self):
+		""" sharepoint doesn't take html files but takes aspx files to display html language.
+		This is bit more work than just changing file name extensions. for more info, read html_to_aspx.py file.
+		"""
+		browser_folder_path = self.dst_path # path to the /browser folder
+		new_folder_path = os.path.join(os.path.split(browser_folder_path)[0],'browser_aspx')
+		html_to_aspx.main(browser_folder_path, new_folder_path)
+
+
 	def run_all(self):
 		self.tbl_2_dict()
 		self.move_templates()
@@ -452,8 +440,9 @@ class To_browsers:
 		self.create_proj_pages1()
 		self.create_proj_pages2()
 		self.create_proj_pages3()
-		self.add_supp_doc()
-		self.add_log()
+		# self.add_supp_doc()
+		# self.add_log()
+		self.create_aspx_files()
 
 ##############    End of class "To_browsers"   ######################
 
@@ -468,6 +457,22 @@ class To_browsers:
 def create_html_filename(projectID):
 	html_filename = 'p_' + common_functions.no_special_char(projectID) + '.html'
 	return html_filename
+
+
+def proj_comments_summary(proj_comments):
+	return_str = ""
+	all_comments = eval(proj_comments)
+	# eg.{'27': {'cluster': '', 'ecosite': '', 'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '', 'P6': '', 'P7': '', 'P8': ''}, 
+	#   '14': {'cluster': '', 'ecosite': '', 'P1': 'No FTG due to residual spruce', 'P2': '', 'P3': '', 'P4': '', 'P5': '', 'P6': '', 'P7': '', 'P8': ''},...}
+	if len(all_comments) > 1:
+		for clus, comment_dict in all_comments.items():
+			for plot, comment in comment_dict.items():
+				if len(comment) > 0:
+					return_str += "Cluster %s %s: %s<br>"%(clus, plot, comment)
+	if len(return_str)>4:
+		return_str = return_str[:-4]
+	return return_str
+
 
 
 def spcomp_to_html_table(spcomp, title):
@@ -662,4 +667,12 @@ if __name__ == '__main__':
 	'SW': {'mean': 70.44, 'stdv': 16.1187, 'ci': 20.014, 'upper_ci': 90.454, 'lower_ci': 50.426, 'n': 5, 'confidence': 0.95}, 
 	'BN': {'mean': 1.24, 'stdv': 2.7727, 'ci': 3.4428, 'upper_ci': 4.6828, 'lower_ci': -2.2028, 'n': 5, 'confidence': 0.95}}
 
-	print(spcomp_to_html_table(spcomp_example, 'Test'))
+	# print(spcomp_to_html_table(spcomp_example, 'Test'))
+
+	proj_comm = {'27': {'cluster': '', 'ecosite': '', 'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '', 'P6': '', 'P7': '', 'P8': ''}, 
+	'14': {'cluster': '', 'ecosite': '', 'P1': 'No FTG due to residual spruce', 'P2': '', 'P3': '', 'P4': '', 'P5': '', 'P6': '', 'P7': '', 'P8': ''}, 
+	'7': {'cluster': '', 'ecosite': '', 'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '', 'P6': '', 'P7': '', 'P8': ''}, 
+	'15': {'cluster': '', 'ecosite': '', 'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '', 'P6': '', 'P7': '', 'P8': ''}, 
+	'28': {'cluster': '', 'ecosite': '', 'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '', 'P6': '', 'P7': '', 'P8': ''}}
+
+	print(proj_comments_summary(proj_comm))

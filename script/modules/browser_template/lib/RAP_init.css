@@ -9,14 +9,16 @@ h1 {
 	line-height: 1.1;
 	font-weight: normal;
 	color: white;
-	background: steelblue;
+/*	background: steelblue;*/
+	background: #27AE60;
 	margin: 0;
 	text-transform: uppercase;
 	padding: 20px 0;
 }
 
 #stripe {
-	background: rgb(204, 239, 255);
+/*	background: rgb(204, 239, 255);*/
+	background: #D4EFDF;
 	height: 30px;
 	text-align: center;
 	color: black;
@@ -29,7 +31,8 @@ button {
 	height: 100%;
 	min-width: 100px;
 	font-weight: 700;
-	color: steelblue;
+/*	color: steelblue;*/
+	color: #27AE60;
 	letter-spacing: 1px;
 	font-size: inherit;
 	transition: all 0.3s;
@@ -40,12 +43,14 @@ button {
 
 button:hover {
 	color: white;
-	background: steelblue;
+/*	background: steelblue;*/
+	background: #27AE60;
 }
 
 .selected {
 	color: white;
-	background: steelblue;
+/*	background: steelblue;*/
+	background: #27AE60;
 }
 
 .dashboard {
@@ -62,4 +67,10 @@ button:hover {
 	margin: 40px auto;
 	height: 500px;
 	width: 90%;
+}
+
+#home {
+	width: 80%;
+	margin: auto;
+	font-size: 80%;
 }
