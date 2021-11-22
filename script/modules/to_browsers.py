@@ -441,7 +441,7 @@ class To_browsers:
 		self.create_proj_pages2()
 		self.create_proj_pages3()
 		# self.add_supp_doc()
-		# self.add_log()
+		self.add_log()
 		self.create_aspx_files()
 
 ##############    End of class "To_browsers"   ######################
